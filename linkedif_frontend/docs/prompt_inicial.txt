@@ -1,0 +1,95 @@
+```
+Crie um protótipo de alta fidelidade para um site de Banco de Talentos voltado para estudantes e ex-alunos do IFNMG – Campus Montes Claros, com possibilidade de expansão para outros campi.
+
+🎯 Objetivo do site
+
+O site deve funcionar como uma plataforma de conexão entre alunos, ex-alunos, professores e empresas.
+Ele deve permitir que:
+
+Estudantes e ex-alunos criem perfis profissionais e exibam suas competências técnicas, experiências, formações e projetos.
+
+Empresas publiquem vagas de emprego e estágio.
+
+Professores encontrem alunos com habilidades específicas para projetos de pesquisa, extensão ou monitoria.
+
+O Instituto tenha uma visão geral das competências técnicas de sua comunidade acadêmica.
+
+🖥️ Páginas principais
+
+Página inicial
+
+Banner institucional (logo IFNMG + chamada principal: “Conectando talentos e oportunidades”)
+
+Breve explicação sobre a plataforma
+
+Botões de acesso: “Sou aluno/ex-aluno”, “Sou empresa”, “Sou professor”
+
+Sessão de vagas recentes e perfis em destaque
+
+Página de login e cadastro
+
+Opções de cadastro para “Aluno/Ex-aluno”, “Professor” e “Empresa”
+
+Campos: nome, e-mail, senha, confirmação, vínculo com o IFNMG
+
+Design limpo, com ícones e cores do IFNMG (verde, branco e cinza)
+
+Perfil do usuário (aluno/ex-aluno)
+
+Foto de perfil, nome completo, curso, campus
+
+Seções: “Sobre mim”, “Habilidades técnicas”, “Experiências”, “Projetos”, “Currículo (upload PDF)”
+
+Botão “Editar perfil”
+
+Visual limpo e profissional, estilo LinkedIn
+
+Área da empresa
+
+Painel para publicar e gerenciar vagas
+
+Formulário de criação de vaga (título, descrição, requisitos, carga horária, tipo: estágio/emprego, local, remuneração)
+
+Lista de candidatos interessados
+
+Área do professor
+
+Ferramenta de busca por alunos com base em habilidades e cursos
+
+Filtro por campus, curso, área de conhecimento e disponibilidade
+
+Painel administrativo (IFNMG)
+
+Visualização de estatísticas gerais: número de perfis, vagas, contratações, áreas mais procuradas
+
+Opção de exportar relatórios
+
+🎨 Estilo visual
+
+Cores base: Verde institucional IFNMG (#006633), branco e cinza claro
+
+Tipografia: Moderna e legível (Ex: Inter, Roboto ou Poppins)
+
+Estilo geral: Profissional, limpo e acessível
+
+Layout responsivo: adaptado para desktop, tablet e mobile
+
+🧩 Funcionalidades simuladas no protótipo
+
+Menu de navegação fixo
+
+Cards de perfil e vagas
+
+Campos de busca com filtros
+
+Botões interativos (simulados)
+
+Modal de “Visualizar detalhes da vaga”
+
+💡 Inspirações
+
+LinkedIn (para layout e exibição de perfil)
+
+Portal do IFNMG (para identidade visual e branding)
+Indeed / Glassdoor (para listagem de vagas)
+```
