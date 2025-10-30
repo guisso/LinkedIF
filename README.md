@@ -14,9 +14,6 @@ Sumário
   - [Estrutura sugerida de branches](#estrutura-sugerida-de-branches)
   - [Revisões de código e Pull Requests](#revisões-de-código-e-pull-requests)
 - [Estrutura do repositório (exemplo)](#estrutura-do-repositório-exemplo)
-- [Contribuição](#contribuição)
-- [Licença](#licença)
-- [Contato](#contato)
 
 Visão geral
 ---
