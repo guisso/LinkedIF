@@ -1,125 +1,104 @@
-# LinkedIF — Banco de Talentos
+<div align="center">
 
-Introdução
----
-O objetivo principal do projeto é criar uma ferramenta de banco de talentos. Esta ferramenta permitirá que o instituto conheça as habilidades técnicas e competências dos seus alunos e ex-alunos, facilitando a divulgação de vagas de emprego, estágio e oportunidades em projetos de extensão e pesquisa. A ferramenta também ajudará os professores a encontrar alunos com perfis específicos para diversas necessidades.
+# LinkedIF 
 
-Sumário
----
-- [Visão Geral](#visão-geral)
-- [Funcionalidades](#funcionalidades)
-- [Orientações para Desenvolvedores](#orientações-para-desenvolvedores)
-  - [Convenções de commits (Conventional Commits)](#convenções-de-commits-conventional-commits)
-  - [Boas práticas de branches](#boas-práticas-de-branches)
-  - [Estrutura sugerida de branches](#estrutura-sugerida-de-branches)
-  - [Revisões de código e Pull Requests](#revisões-de-código-e-pull-requests)
-- [Estrutura do repositório (exemplo)](#estrutura-do-repositório-exemplo)
+Conectando talentos do Instituto Federal do Norte de Minas Gerais a oportunidades do mercado.
 
-Visão geral
----
-LinkedIF é a implementação do banco de talentos do instituto, composto por frontend e backend que permitem:
-- cadastro e manutenção de perfis de alunos e egressos;
-- pesquisa e filtragem por habilidades, cursos, disponibilidade e localização;
-- publicação e divulgação de vagas (emprego, estágio, projetos);
-- associação de professores a demandas para encontrar perfis adequados.
+![GitHub last commit](https://img.shields.io/github/last-commit/SEU_USUARIO/SEU_REPOSITORIO)
+![License](https://img.shields.io/github/license/SEU_USUARIO/SEU_REPOSITORIO)
+![Issues](https://img.shields.io/github/issues/SEU_USUARIO/SEU_REPOSITORIO)
+![Build](https://img.shields.io/github/actions/workflow/status/SEU_USUARIO/SEU_REPOSITORIO/ci.yml)
+</div>
 
-Funcionalidades (exemplos)
----
-- Autenticação (alunos, ex-alunos, professores, administradores)
-- Cadastro de habilidades e validação de competências
-- Feed de oportunidades e sistema de candidaturas
-- Filtros avançados e tags por áreas de atuação
-- Painel administrativo para gestão de vagas e usuários
+<br>
 
-Orientações para Desenvolvedores
----
-Esta seção descreve práticas recomendadas para manter o repositório organizado, facilitar revisão e garantir qualidade.
+## 💡 Sobre o Projeto
 
-Convenções de commits (Conventional Commits)
-- Siga o estilo "Conventional Commits" para tornar o histórico legível e possibilitar releases automatizados.
-- Formato: <tipo>(escopo opcional): descrição curta
-- Tipos recomendados:
-  - feat: nova funcionalidade
-  - fix: correção de bug
-  - docs: documentação apenas
-  - style: formatação, espaços, ponto e vírgula; sem alteração de lógica
-  - refactor: alteração de código que não corrige bug nem adiciona feature
-  - perf: melhoria de performance
-  - test: adicionar/ajustar testes
-  - chore: tarefas de manutenção (build, CI, deps)
-- Exemplos:
-  - feat(auth): adicionar endpoint de login com JWT
-  - fix(api): corrigir filtro por skills
-  - docs(readme): atualizar seção de instalação
-- Mensagem de commit:
-  - seja curta e no imperativo (ex.: "Adicionar rota de logout")
-  - corpo do commit (quando necessário): explique o porquê e o que foi feito, referências a issues (ex.: "Refs #42")
-  - footer: informações sobre breaking changes quando houver (BREAKING CHANGE: ...)
+O LinkedIF é uma plataforma desenvolvida como um ecossistema de conexões voltado à comunidade do IFNMG. Atua como uma ferramenta de banco de talentos — denominada Banco de Talentos/LinkedIF — cuja finalidade principal é mapear, organizar e divulgar as competências e habilidades dos estudantes e egressos da instituição.
 
-Boas práticas de branches
-- Tenha sempre uma branch principal estável e protegida (ex.: main ou master). Configure proteção de branch e revisões obrigatórias.
-- Use uma branch por feature/bugfix/hotfix para facilitar revisão e reverts.
-- Nomeie branches de forma clara e consistente: <escopo>/<tipo>-<descrição-curta>
-  - exemplos de tipos: feat, fix, refactor, docs, test
-  - exemplos:
-    - backend/feat-login
-    - frontend/feat-pagina-de-login
-    - frontend/feat-pagina-de-oportunidades
-    - backend/fix-sql-injection
-- Mantenha seu branch sincronizado com a branch principal: rebase ou merge regularmente antes do PR.
-- Não faça commits diretos na branch principal sem passar por PR.
+O sistema cria um canal direto e eficiente para conectar o talento acadêmico ao mercado, facilitando a divulgação de vagas e projetos. Além disso, promove a interação entre os ofertantes de oportunidades (professores e empresas) e os talentos (alunos e ex-alunos), fortalecendo a conexão entre quem busca e quem oferece oportunidades.
 
-Estrutura sugerida de branches (exemplo)
-- main (branch principal protegida)
-- backend (pasta/área do backend — não é obrigatório ser branch, aqui sugerimos prefixo para branches relacionadas ao backend)
-- frontend (idem para frontend)
-Estrutura de feature branches sugerida:
-- /backend
-  - backend/feat-autenticacao
-  - backend/fix-validacao-campo
-- /frontend
-  - frontend/feat-pagina-de-login
-  - frontend/feat-pagina-de-oportunidades
-  - frontend/refactor-header
+### Objetivos estratégicos e operacionais da plataforma:
+- Centralizar Oportunidades: Reunir em um ambiente unificado todas as vagas de estágio, emprego e projetos de pesquisa e extensão.
+- Agilizar a Inserção Profissional: Possibilitar o acesso direto dos alunos ao mercado de trabalho, conectando-os a empresas que valorizam a formação técnica e acadêmica proporcionada pelo IFNMG.
+- Estimular a Participação Acadêmica: Ampliar a visibilidade dos projetos institucionais, incentivando o engajamento estudantil em iniciativas de pesquisa e extensão.
+- Aprimorar o Processo de Recrutamento: Tornar mais eficiente a divulgação de projetos e a seleção de talentos, reduzindo custos e tempo de contratação de bolsistas ou voluntários.
+- Promover a Comunicação: Facilitar a interação direta entre alunos e ofertantes por meio de funcionalidades como mensagens e inscrições integradas.
+- Fortalecer a Empregabilidade dos Egressos: Acompanhar a trajetória profissional dos ex-alunos e ampliar suas oportunidades no mercado, reforçando o prestígio institucional.
 
-Observação sobre pastas vs branches:
-- Use nomes de branch que reflitam área do código (backend/frontend) e a feature específica, como nos exemplos acima. A árvore de diretórios do repo deve conter /backend e /frontend, e as branches devem ser nomeadas conforme convenção para fácil identificação.
 
-Revisões de código e Pull Requests
-- Abra Pull Requests (PRs) descrevendo:
-  - objetivo da mudança;
-  - screenshots ou GIFs (para mudanças visuais);
-  - como testar localmente (passos);
-  - requisitos e checklist (testes, lint, build OK).
-- Inclua links para issues relacionadas (ex.: "Closes #12").
-- Solicite pelo menos 1-2 revisores (dependendo da criticidade).
-- Peça revisão de arquitetura quando a mudança afetar integrações ou modelos de dados.
-- Não faça merge até que:
-  - CI esteja verde;
-  - revisores aprovem;
-  - conflitos com a branch principal estejam resolvidos.
+### Requisitos funcionais
+-
+-
+-
+-
 
-Estrutura do repositório (exemplo)
----
-- /backend
-  - README.md (backend)
-  - src/
-  - tests/
-  - Dockerfile
-- /frontend
-  - README.md (frontend)
-  - src/
-  - public/
-  - tests/
-- /docs
-- .github/workflows/ (CI)
-- .env.example
-- README.md
-- LICENSE
+### Requisitos não-funcionais
+-
+-
+-
+-
 
-Contribuição
----
-- Abra uma issue antes de iniciar mudanças grandes para alinhar a solução.
-- Siga as orientações de branches e commits.
-- Execute testes localmente e garanta que o CI passe.
-- Mantenha PRs pequenos e focados.
+<br>
+
+## ⚙️ Tecnologias
+
+Este projeto foi desenvolvido com as seguintes tecnologias:
+
+
+- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://react.dev/)
+- [Laravel](https://laravel.com/docs/12.x)
+
+<br>
+
+
+## 🧱 Estrutura
+
+```
+app/
+├── Models/              → Entidades e regras de negócio
+├── Http/
+│   ├── Controllers/     → Lógica de controle e fluxo de dados
+│   ├── Middleware/      → Autenticação e autorização
+│   └── Requests/        → Validação de dados de entrada
+├── Services/            → Regras de negócio e persistência (customizado)
+├── Policies/            → Autorização por perfil
+├── Providers/           → Configurações e serviços
+resources/
+├── views/               → Camada de visão (Blade templates)
+routes/
+├── web.php              → Rotas da aplicação
+database/
+├── migrations/          → Estrutura do banco de dados
+├── seeders/             → Dados iniciais
+config/
+├── auth.php             → Configuração de autenticação
+```
+
+<br>
+
+## 📝 Diagrama de classes
+
+ / diagrama aqui /
+
+<br>
+
+## 🤝 Equipe e Colaboradores
+
+Este projeto está sendo desenvolvido e orientado pela seguinte equipe:
+
+### Professores:
+
+    Prof. Luis Guisso (https://github.com/guisso)
+    Prof. Danilo Silva (https://github.com/........)
+    Prof. Wagner Santos (https://github.com/.......)
+
+### Discentes (Desenvolvedores):
+
+    Ana (https://github.com/.........)
+    Ana (https://github.com/.........
+    Eduardo (https://github.com/.........)
+    Gabriel (https://github.com/........)
+
+  
