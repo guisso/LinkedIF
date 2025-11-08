@@ -38,6 +38,8 @@ class Credencial extends Entidade
         'ativo',
         'codigo',
         'tipo_perfil',
+        'api_token',
+        'token_expira_em',
     ];
 
     /**
@@ -48,6 +50,7 @@ class Credencial extends Entidade
     protected $hidden = [
         'senha',
         'codigo',
+        'api_token',
     ];
 
     /**
@@ -60,6 +63,7 @@ class Credencial extends Entidade
         'tipo_perfil' => TipoPerfil::class,
         'criacao' => 'datetime',
         'ultima_atualizacao' => 'datetime',
+        'token_expira_em' => 'datetime',
     ];
 
     /**
