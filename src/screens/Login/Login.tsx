@@ -9,6 +9,7 @@ const Login: React.FC = () => {
     userType,
     formData,
     error,
+    isLoading,
     handleInputChange,
     handleUserTypeChange,
     handleSubmit,
@@ -219,8 +220,8 @@ const Login: React.FC = () => {
               </div>
             )}
 
-            <button type="submit" className="btn-submit">
-              {mode === 'login' ? 'Entrar' : 'Cadastrar'}
+            <button type="submit" className="btn-submit" disabled={isLoading}>
+              {isLoading ? 'Carregando...' : (mode === 'login' ? 'Entrar' : 'Cadastrar')}
             </button>
 
             {mode === 'login' && (

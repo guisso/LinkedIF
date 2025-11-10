@@ -113,12 +113,32 @@ Located in `src/types/`:
 --success: #2e7d32
 ```
 
+### Routing
+
+**React Router DOM** (`src/routes/index.tsx`):
+- Uses `createBrowserRouter` from React Router v7
+- Centralized route configuration
+- Routes are defined in `src/routes/index.tsx`
+- Main App component (`App.tsx`) uses `RouterProvider` to render routes
+
+**Adding new routes:**
+```typescript
+// In src/routes/index.tsx
+export const router = createBrowserRouter([
+  {
+    path: '/your-path',
+    element: <YourScreen />,
+  },
+]);
+```
+
 ### Folder Structure
 
 ```
 src/
 ├── components/     # Reusable UI components
 ├── screens/        # Page-level components (with hooks pattern)
+├── routes/         # Route configuration (React Router)
 ├── hooks/          # Shared custom hooks
 ├── services/       # API calls and external services
 ├── types/          # TypeScript type definitions
@@ -142,11 +162,11 @@ Montes Claros, Almenara, Araçuaí, Arinos, Diamantina, Januária, Pirapora, Por
 
 ## Tech Stack
 
-- **React 19** with TypeScript
-- **Vite 7** for build tooling
+- **React 19.1.1** with TypeScript
+- **Vite 7.1.7** for build tooling
+- **React Router DOM 7.9.5** for routing
 - **CSS3** with CSS Variables (no CSS-in-JS or preprocessors)
-- No routing library yet (to be added)
-- No state management library yet (to be added)
+- No state management library yet (Context API used for now)
 
 ## Important Notes
 

@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { UserType } from '../../types';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuthContext } from '../../context/AuthContext';
+import type { SignUpData } from '../../hooks/useAuth';
 
 export type LoginMode = 'login' | 'register';
 
@@ -31,6 +35,9 @@ export const useLogin = () => {
   const [userType, setUserType] = useState<UserType>(UserType.STUDENT);
   const [formData, setFormData] = useState<LoginFormData>(initialFormData);
   const [error, setError] = useState<string>('');
+  const navigate = useNavigate();
+  const { signIn, signUp } = useAuthContext();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -89,7 +96,7 @@ export const useLogin = () => {
     return true;
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -97,16 +104,59 @@ export const useLogin = () => {
       return;
     }
 
-    // TODO: Implementar lógica de autenticação/cadastro
-    console.log('Form submitted:', { mode, userType, formData });
+    setIsLoading(true);
 
-    // Simulação de sucesso
-    if (mode === 'login') {
-      console.log('Login realizado com sucesso');
-      // Aqui você implementará a navegação para a tela principal
-    } else {
-      console.log('Cadastro realizado com sucesso');
-      // Aqui você implementará a navegação ou mudança para login
+    try {
+      if (mode === 'login') {
+        // LOGIN
+        const { data, error } = await signIn(formData.email, formData.password);
+
+        if (error || !data) {
+          setError('Email ou senha incorretos');
+          toast.error('Erro ao fazer login. Verifique suas credenciais.');
+          return;
+        }
+
+        toast.success(`Bem-vindo(a), ${data.name}!`);
+        navigate('/');
+
+      } else {
+        // CADASTRO
+        const signUpData: SignUpData = {
+          email: formData.email,
+          password: formData.password,
+          name: formData.name,
+          userType,
+        };
+
+        // Adiciona campos específicos por tipo
+        if (userType === UserType.STUDENT || userType === UserType.ALUMNI) {
+          signUpData.campus = formData.campus;
+          signUpData.course = formData.course;
+        } else if (userType === UserType.TEACHER) {
+          signUpData.campus = formData.campus;
+          signUpData.department = formData.department;
+        } else if (userType === UserType.COMPANY) {
+          signUpData.cnpj = formData.cnpj;
+        }
+
+        const { data, error } = await signUp(signUpData);
+
+        if (error || !data) {
+          setError('Erro ao criar conta. Tente novamente.');
+          toast.error('Erro ao criar conta.');
+          return;
+        }
+
+        toast.success('Conta criada com sucesso!');
+        navigate('/');
+      }
+    } catch (err) {
+      console.error('[useLogin] Erro:', err);
+      setError('Ocorreu um erro inesperado.');
+      toast.error('Erro inesperado.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -133,6 +183,7 @@ export const useLogin = () => {
     userType,
     formData,
     error,
+    isLoading,
     handleInputChange,
     handleUserTypeChange,
     handleSubmit,
