@@ -1,0 +1,148 @@
+Instruções do projeto — telas e requisitos
+
+Sumário
+1. Tela de Perfil do Aluno (logado)
+2. Tela de Cadastro de Oportunidades (Professor - logado)
+3. Tela de Cadastro de Oportunidades (Empresa - logado)
+4. Tela de Oportunidades (Aluno - logado)
+5. Tela de Minhas Candidaturas (Aluno - logado)
+
+Observações gerais
+- As telas devem seguir o padrão de estilização já existente no projeto.
+- Usar componentes reutilizáveis do diretório `src/assets/components/ui` quando aplicável.
+- Campos marcados como (somente leitura) não devem ser editáveis pelo usuário.
+- Validação: realizar validação básica no frontend (campos obrigatórios, formatos de email/URL, datas) e transmitir também ao backend.
+
+1) Tela de Perfil do Aluno (logado)
+Propósito:
+- Permitir que o aluno cadastre e edite seu próprio perfil.
+Público:
+- Alunos autenticados.
+Campos (label — tipo — observações):
+- Nome completo — texto — obrigatório
+- Curso — texto/seleção — opcional/segundo dados do estudante
+- Período / Semestre atual — número/texto — opcional
+- E-mail institucional — email (somente leitura) — preenchido pelo cadastro/SSO
+- Telefone — texto — formato livre, sugerir máscara
+- Breve descrição / Sobre mim — textarea — opcional, limite ~500 caracteres
+- Habilidades — tags (múltiplas) — opcional, sugerir autocomplete com tags comuns
+- Competências — checklist / seleção múltipla — opcional (soft-skills)
+- Link para portfólio — URL — opcional (GitHub, LinkedIn, etc.)
+Ações / botões:
+- Salvar Perfil — valida e envia os dados
+- (Opcional) Cancelar / Reverter — descarta alterações
+Layout / UI:
+- Painel de perfil com foto no topo (avatar), nome, resumo e botão de editar.
+- Formulário em painel separado ou modal, dependendo do layout atual.
+Critérios de aceitação (simples):
+- O formulário carrega os dados do usuário autenticado.
+- Campos obrigatórios são validados antes do envio.
+- O e-mail institucional aparece como somente leitura.
+- Ao salvar, mostra feedback (sucesso/erro) e atualiza a visualização do perfil.
+
+2) Tela de Cadastro de Oportunidades (Professor - logado)
+Propósito:
+- Permitir que professores criem oportunidades de projetos, estágios ou bolsas acadêmicas.
+Público:
+- Professores autenticados (role: teacher).
+Campos:
+- Título da oportunidade — texto — obrigatório
+- Tipo — seleção — opções: Projeto / Estágio / Bolsa — obrigatório
+- Descrição detalhada — textarea — obrigatório
+- Requisitos / Habilidades desejadas — tags ou textarea — opcional
+- Carga horária semanal — número/texto — opcional
+- Data limite de inscrição — date — opcional
+Ações / botões:
+- Publicar Oportunidade — cria/atualiza a oportunidade
+- Cancelar — descarta alterações
+Listagem e edição:
+- Lista abaixo com oportunidades já criadas pelo professor, cada item com ações: Editar, Remover.
+Critérios de aceitação:
+- Possibilidade de criar, editar e remover oportunidades.
+- Lista atualiza após operações e confirma remoção com diálogo.
+- Validação mínima (título e tipo obrigatórios).
+
+3) Tela de Cadastro de Oportunidades (Empresa - logado)
+Propósito:
+- Permitir empresas criarem vagas de emprego ou estágios profissionais.
+Público:
+- Usuários com papel empresa (role: company).
+Campos:
+- Nome da vaga — texto — obrigatório
+- Tipo — seleção — Emprego / Estágio — obrigatório
+- Descrição — textarea — obrigatório
+- Requisitos técnicos e comportamentais — textarea / tags — opcional
+- Local ou modelo — seleção / texto — opções: Presencial / Híbrido / Remoto — opcional
+- Salário / bolsa — texto — opcional
+- Data limite para candidatura — date — opcional
+Ações / botões:
+- Publicar Vaga — cria/atualiza a vaga
+- Cancelar — descarta alterações
+Listagem:
+- Exibir lista de vagas cadastradas pela empresa com opções Editar e Excluir.
+Critérios de aceitação:
+- CRUD básico para vagas.
+- Lista paginada ou rolável se muitas vagas.
+
+4) Tela de Oportunidades (Aluno - logado)
+Propósito:
+- Exibir todas as oportunidades disponíveis (de professores e empresas) para candidatos-alunos.
+Público:
+- Alunos autenticados.
+Funcionalidades principais:
+- Exibir cards de oportunidade com:
+  - Título
+  - Autor (professor ou empresa)
+  - Descrição resumida (ex.: 200 caracteres)
+  - Habilidades requeridas (tags)
+  - Tipo (Projeto / Estágio / Emprego)
+  - Botão Candidatar-se
+- Filtros / buscas:
+  - Filtro por tipo (Projeto, Estágio, Emprego)
+  - Busca por texto (título/descrição)
+- Ao clicar em “Candidatar-se”:
+  - Registrar a candidatura do aluno (persistir no backend)
+  - Mostrar confirmação (toaster / modal)
+  - Prevenir candidaturas duplicadas (desabilitar botão se já candidato)
+
+5) Tela de Minhas Candidaturas (Aluno - logado)
+Propósito:
+- Mostrar todas as oportunidades às quais o aluno se candidatou e o status de cada candidatura.
+Público:
+- Alunos autenticados.
+Exibição por item / colunas:
+- Nome da oportunidade
+- Tipo (Projeto / Estágio / Emprego)
+- Autor (opcional)
+- Data da candidatura
+- Status: Pendente / Aprovado / Recusado
+Ações:
+- Ver detalhes da oportunidade (link ou modal)
+- (Opcional) Retirar candidatura — se a regra de negócio permitir
+Critérios de aceitação:
+- Lista reflete os registros do backend para o usuário autenticado.
+- Status atualizados conforme evolução (dependente do backend).
+
+Estilo visual sugerido
+- Seguir o padrão de estilização do projeto (tailwind + componentes do diretório `src/assets/components/ui`).
+- Layout moderno, painel de perfil com avatar, uso de cards para oportunidades.
+
+Notas técnicas e sugestões rápidas
+- Reutilizar componentes de formulário existentes (Input, Textarea, Select, Tag, DatePicker, Button).
+- Normalizar campos de data em ISO (YYYY-MM-DD) para API.
+- Habilidades: armazenar como array de strings.
+- Competências: usar enum/IDs no backend; no frontend suportar seleção por label.
+- Endpoints (sugestão):
+  - GET /profile/me, PUT /profile/me
+  - GET /oportunidades, POST /oportunidades, PUT /oportunidades/:id, DELETE /oportunidades/:id
+  - POST /oportunidades/:id/candidaturas, GET /users/:id/candidaturas
+
+Checklist de desenvolvimento (mínimo)
+- [ ] Implementar formulário de perfil com carregamento e salvamento
+- [ ] Implementar telas de criação/edição de oportunidades (professor e empresa)
+- [ ] Implementar listagem pública de oportunidades com filtros e candidatura
+- [ ] Implementar tela de "Minhas Candidaturas" com status
+- [ ] Reutilizar e documentar componentes UI usados
+
+Histórico
+- Arquivo reorganizado a partir das instruções originais (conteúdo preservado e estruturado).

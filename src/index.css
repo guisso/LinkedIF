@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 150 100% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 150 100% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 150 100% 15%;
+
+    /* Verde IFNMG como primária */
+    --primary: 150 100% 20%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 150 100% 25%;
+    --primary-light: 150 60% 95%;
+
+    /* Cinza claro para secundária */
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 150 100% 20%;
+
+    --muted: 210 20% 98%;
+    --muted-foreground: 210 10% 40%;
+
+    --accent: 150 60% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 150 100% 20%;
+
+    --radius: 0.75rem;
+
+    /* Gradientes personalizados */
+    --gradient-primary: linear-gradient(135deg, hsl(150, 100%, 20%), hsl(150, 100%, 30%));
+    --gradient-hero: linear-gradient(135deg, hsl(150, 100%, 20%) 0%, hsl(150, 80%, 25%) 100%);
+    
+    /* Sombras elegantes */
+    --shadow-sm: 0 1px 2px 0 hsl(150 100% 20% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(150 100% 20% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(150 100% 20% / 0.15);
+    --shadow-xl: 0 20px 25px -5px hsl(150 100% 20% / 0.2);
+    
+    /* Transições suaves */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 150 100% 5%;
+    --foreground: 0 0% 98%;
+
+    --card: 150 100% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 150 100% 8%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 150 80% 45%;
+    --primary-foreground: 150 100% 5%;
+    --primary-hover: 150 80% 50%;
+    --primary-light: 150 60% 15%;
+
+    --secondary: 150 20% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 150 20% 15%;
+    --muted-foreground: 210 10% 60%;
+
+    --accent: 150 60% 40%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 150 20% 20%;
+    --input: 150 20% 20%;
+    --ring: 150 80% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .shadow-elegant {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
