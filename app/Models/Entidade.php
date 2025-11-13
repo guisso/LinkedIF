@@ -20,12 +20,12 @@ abstract class Entidade extends Model
      *
      * @var string
      */
-    const CREATED_AT = 'criacao';
+    //const CREATED_AT = 'criacao';
 
     /**
      * Define o nome da coluna "updated at" para 'ultimaAtualizacao'.
      *
      * @var string
      */
-    const UPDATED_AT = 'ultimaAtualizacao';
+    //const UPDATED_AT = 'ultimaAtualizacao';
 }
