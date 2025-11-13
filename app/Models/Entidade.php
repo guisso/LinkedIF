@@ -16,6 +16,13 @@ use Illuminate\Database\Eloquent\Model;
 abstract class Entidade extends Model
 {
     /**
+     * Chave primária.
+     *
+     * @var string
+     */
+    
+    protected $keyType = 'int';
+    /**
      * Define o nome da coluna "created at" para 'criacao'.
      *
      * @var string
