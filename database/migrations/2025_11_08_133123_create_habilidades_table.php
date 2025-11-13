@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('habilidades', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('nome', 20)->unique(); // maxLength=20, unique
+            
         });
     }
 

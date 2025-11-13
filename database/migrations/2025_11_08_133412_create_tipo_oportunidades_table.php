@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tipo_oportunidades', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->string('nome', 20)->unique(); // maxLength=20, unique
         });
     }
 
