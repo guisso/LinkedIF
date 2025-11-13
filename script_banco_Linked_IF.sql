@@ -40,7 +40,7 @@ CREATE INDEX idx_usuario_nome ON usuario (nome);
 COMMENT ON TABLE usuario IS 'Tabela que armazena informações básicas dos usuários do sistema.';
 COMMENT ON COLUMN usuario.id_entidade IS 'Chave estrangeira para a tabela entidade.';
 COMMENT ON COLUMN usuario.nome IS 'Nome completo do usuário.';
-COMMENT ON COLUMN usuario.cpf IS 'CPF do usuário, formato numérico com 11 dígitos.';
+--COMMENT ON COLUMN usuario.cpf IS 'CPF do usuário, formato numérico com 11 dígitos.';
 COMMENT ON COLUMN usuario.email IS 'Endereço de e-mail do usuário.';
 COMMENT ON COLUMN usuario.telefone IS 'Número de telefone do usuário.';
 COMMENT ON COLUMN usuario.data_nascimento IS 'Data de nascimento.';
