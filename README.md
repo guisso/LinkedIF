@@ -144,6 +144,7 @@ Este projeto está sendo desenvolvido e orientado pela seguinte equipe:
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/odavimendes"><img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/odavimendes?v=4" width="100px;" alt=""/><br /><sub><b>Davi Silva Mendes</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/DiegogMagalhaes"><img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/DiegogMagalhaes?v=4" width="100px;" alt=""/><br /><sub><b>Diego Gabriel Magalhaes Barbosa</b></sub></a><br /></td>
   </tr>
 </table>
 </div>
