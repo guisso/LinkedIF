@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('credenciais', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('usuario_id')
+                  ->nullable()
+                  ->constrained('usuarios')
+                  ->onDelete('cascade')
+                  ->comment('Chave estrangeira para o usuário dono da credencial');
             $table->string('nome_usuario', 20)
                   ->unique()
                   ->comment('Nome de usuário único utilizado na autenticação');
@@ -38,8 +43,9 @@ return new class extends Migration
                   ->comment('Data de expiração do token');
             $table->timestamps();
             
-            // Índice adicional
+            // Índices
             $table->index('nome_usuario', 'idx_credencial_nome_usuario');
+            $table->index('usuario_id', 'idx_credencial_usuario_id');
         });
     }
 

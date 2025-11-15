@@ -29,7 +29,7 @@ Route::post('/auth/redefinir-senha', [AuthController::class, 'redefinirSenha'])-
 
 // ==================== ROTAS PROTEGIDAS (Requerem autenticação) ====================
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth.token')->group(function () {
     // Logout
     Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
     

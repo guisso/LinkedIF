@@ -247,14 +247,15 @@
                     successMessage.classList.add('show');
                     
                     // Armazenar token
-                    if (data.token) {
-                        localStorage.setItem('auth_token', data.token);
+                    if (data.data && data.data.token) {
+                        localStorage.setItem('auth_token', data.data.token);
+                        localStorage.setItem('user_data', JSON.stringify(data.data));
                     }
                     
                     // Mostrar informações do usuário
                     form.style.display = 'none';
                     document.querySelector('.register-link').style.display = 'none';
-                    showUserInfo(data);
+                    showUserInfo(data.data);
                     
                 } else {
                     errorMessage.textContent = data.message || 'Erro ao realizar login';
@@ -282,27 +283,49 @@
                 const response = await fetch('/api/auth/perfil', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     }
                 });
                 
                 if (response.ok) {
                     const data = await response.json();
+                    const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
                     form.style.display = 'none';
                     document.querySelector('.register-link').style.display = 'none';
-                    showUserInfo({...data, token});
+                    showUserInfo({...userData, ...data.data});
                 } else {
                     localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
                 }
             } catch (error) {
                 console.error('Erro ao carregar perfil:', error);
                 localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
             }
         }
         
         function logout() {
-            localStorage.removeItem('auth_token');
-            location.reload();
+            const token = localStorage.getItem('auth_token');
+            
+            if (token) {
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }).finally(() => {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_data');
+                    location.reload();
+                });
+            } else {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_data');
+                location.reload();
+            }
         }
     </script>
 </body>

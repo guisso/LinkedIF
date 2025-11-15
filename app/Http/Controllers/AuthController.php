@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credencial;
+use App\Models\Usuario;
 use App\Models\Enums\TipoPerfil;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -25,9 +27,20 @@ class AuthController extends Controller
     {
         // Validação dos dados de entrada
         $validador = Validator::make($request->all(), [
+            'nome' => 'required|string|max:45',
+            'email' => 'required|email|max:250|unique:usuarios,email',
+            'telefone' => 'required|string|max:16',
+            'nascimento' => 'required|date',
             'nome_usuario' => 'required|string|max:20|unique:credenciais,nome_usuario',
             'senha' => 'required|string|min:6',
         ], [
+            'nome.required' => 'O nome é obrigatório.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'E-mail inválido.',
+            'email.unique' => 'Este e-mail já está cadastrado.',
+            'telefone.required' => 'O telefone é obrigatório.',
+            'nascimento.required' => 'A data de nascimento é obrigatória.',
+            'nascimento.date' => 'Data de nascimento inválida.',
             'nome_usuario.required' => 'O nome de usuário é obrigatório.',
             'nome_usuario.unique' => 'Este nome de usuário já está em uso.',
             'nome_usuario.max' => 'O nome de usuário deve ter no máximo 20 caracteres.',
@@ -43,27 +56,52 @@ class AuthController extends Controller
             ], 422);
         }
 
+        DB::beginTransaction();
         try {
-            // Cria a credencial com senha criptografada
+            // Calcular idade
+            $nascimento = new \DateTime($request->nascimento);
+            $hoje = new \DateTime();
+            $idade = $hoje->diff($nascimento)->y;
+
+            // Cria o usuário
+            $usuario = new Usuario();
+            $usuario->setNome($request->nome);
+            $usuario->setEmail($request->email);
+            $usuario->setTelefone($request->telefone);
+            $usuario->setWhatsApp($request->whatsapp ?? false);
+            $usuario->setNascimento(\Carbon\Carbon::parse($request->nascimento));
+            $usuario->setIdade($idade);
+            $usuario->save();
+
+            // Cria a credencial vinculada ao usuário
             $credencial = new Credencial();
+            $credencial->usuario_id = $usuario->getId();
             $credencial->setNomeUsuario($request->nome_usuario);
-            $credencial->setSenha(Hash::make($request->senha)); // Senha criptografada
+            $credencial->setSenha(Hash::make($request->senha));
             $credencial->setTipoPerfil(TipoPerfil::CANDIDATO);
-            $credencial->setAtivo(false); // Inicialmente inativo até ativação
+            $credencial->setAtivo(false); 
             $credencial->save();
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Cadastro realizado com sucesso!',
                 'data' => [
-                    'id' => $credencial->getId(),
-                    'nome_usuario' => $credencial->getNomeUsuario(),
-                    'tipo_perfil' => $credencial->getTipoPerfil()->value,
-                    'codigo_ativacao' => $credencial->getCodigo(), // Enviar por e-mail
+                    'usuario' => [
+                        'id' => $usuario->getId(),
+                        'nome' => $usuario->getNome(),
+                        'email' => $usuario->getEmail(),
+                    ],
+                    'credencial' => [
+                        'id' => $credencial->getId(),
+                        'nome_usuario' => $credencial->getNomeUsuario(),
+                    ]
                 ]
             ], 201);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao registrar usuário.',

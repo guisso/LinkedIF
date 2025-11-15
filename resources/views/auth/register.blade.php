@@ -144,6 +144,30 @@
         
         <form id="registerForm">
             <div class="form-group">
+                <label for="nome">Nome completo</label>
+                <input type="text" id="nome" name="nome" required maxlength="45">
+                <div id="nomeError" class="error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email" required maxlength="250">
+                <div id="emailError" class="error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="tel" id="telefone" name="telefone" required maxlength="16">
+                <div id="telefoneError" class="error"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="nascimento">Data de nascimento</label>
+                <input type="date" id="nascimento" name="nascimento" required>
+                <div id="nascimentoError" class="error"></div>
+            </div>
+            
+            <div class="form-group">
                 <label for="nome_usuario">Nome de usuário</label>
                 <input type="text" id="nome_usuario" name="nome_usuario" required maxlength="20">
                 <div id="nome_usuarioError" class="error"></div>
@@ -197,6 +221,10 @@
             submitBtn.textContent = 'Registrando...';
             
             const formData = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value,
+                nascimento: document.getElementById('nascimento').value,
                 nome_usuario: document.getElementById('nome_usuario').value,
                 senha: document.getElementById('senha').value,
             };
