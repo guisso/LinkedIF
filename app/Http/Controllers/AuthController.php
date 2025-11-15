@@ -26,17 +26,13 @@ class AuthController extends Controller
         // Validação dos dados de entrada
         $validador = Validator::make($request->all(), [
             'nome_usuario' => 'required|string|max:20|unique:credenciais,nome_usuario',
-            'senha' => 'required|string|min:8|confirmed',
-            'tipo_perfil' => 'required|string|in:ADMINISTRADOR,CANDIDATO,EMPRESA',
+            'senha' => 'required|string|min:6',
         ], [
             'nome_usuario.required' => 'O nome de usuário é obrigatório.',
             'nome_usuario.unique' => 'Este nome de usuário já está em uso.',
             'nome_usuario.max' => 'O nome de usuário deve ter no máximo 20 caracteres.',
             'senha.required' => 'A senha é obrigatória.',
-            'senha.min' => 'A senha deve ter no mínimo 8 caracteres.',
-            'senha.confirmed' => 'A confirmação de senha não corresponde.',
-            'tipo_perfil.required' => 'O tipo de perfil é obrigatório.',
-            'tipo_perfil.in' => 'Tipo de perfil inválido.',
+            'senha.min' => 'A senha deve ter no mínimo 6 caracteres.',
         ]);
 
         if ($validador->fails()) {
@@ -52,13 +48,13 @@ class AuthController extends Controller
             $credencial = new Credencial();
             $credencial->setNomeUsuario($request->nome_usuario);
             $credencial->setSenha(Hash::make($request->senha)); // Senha criptografada
-            $credencial->setTipoPerfil(TipoPerfil::from($request->tipo_perfil));
+            $credencial->setTipoPerfil(TipoPerfil::CANDIDATO);
             $credencial->setAtivo(false); // Inicialmente inativo até ativação
             $credencial->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Usuário registrado com sucesso. Verifique seu e-mail para ativar a conta.',
+                'message' => 'Cadastro realizado com sucesso!',
                 'data' => [
                     'id' => $credencial->getId(),
                     'nome_usuario' => $credencial->getNomeUsuario(),
