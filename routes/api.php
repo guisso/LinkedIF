@@ -1,27 +1,42 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CandidaturaController;
-use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CandidatoController;
+use App\Http\Controllers\CandidaturaController;
 
-Route::post('/registro', [AuthController::class, 'registro'])->name('auth.registro');
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-Route::post('/ativar-conta', [AuthController::class, 'ativarConta'])->name('auth.ativar');
-Route::post('/solicitar-recuperacao-senha', [AuthController::class, 'solicitarRecuperacaoSenha'])->name('auth.solicitar-recuperacao');
-Route::post('/redefinir-senha', [AuthController::class, 'redefinirSenha'])->name('auth.redefinir-senha');
+Route::prefix('v1')->group(function () {
 
-Route::middleware('auth:api')->group(function () {
+    //ROTAS PÚBLICAS
+    Route::post('/registro', [AuthController::class, 'registro']);
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/ativar-conta', [AuthController::class, 'ativarConta']);
+    Route::post('/solicitar-recuperacao-senha', [AuthController::class, 'solicitarRecuperacaoSenha']);
+    Route::post('/redefinir-senha', [AuthController::class, 'redefinirSenha']);
 
-    // Rotas de Autenticação Protegidas
-    Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
-    Route::get('/perfil', [AuthController::class, 'perfil'])->name('auth.perfil');
-    Route::post('/renovar-token', [AuthController::class, 'renovarToken'])->name('auth.renovar-token');
+    // Candidatos são públicos (currículo aberto)
+    Route::apiResource('candidatos', CandidatoController::class)->only(['index', 'show']);
 
-    // Rotas de Candidaturas (Movida para dentro do grupo protegido)
-    Route::apiResource('candidaturas', CandidaturaController::class);
+
+    //ROTAS AUTENTICADAS
+    Route::middleware('auth:sanctum')->group(function () {
+
+        // Auth & Perfil
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/perfil', [AuthController::class, 'perfil']);
+        Route::post('/renovar-token', [AuthController::class, 'renovarToken']);
+
+        //CANDIDATURAS
+        Route::apiResource('candidaturas', CandidaturaController::class)
+             ->except(['index']); // vamos controlar index manualmente
+
+        // Candidato vê suas próprias candidaturas
+        Route::get('/minhas-candidaturas', [CandidaturaController::class, 'minhas'])
+             ->name('candidaturas.minhas');
+
+        // Editor vê candidaturas de uma oportunidade específica
+        Route::get('/oportunidades/{oportunidadeId}/candidaturas', [CandidaturaController::class, 'porOportunidade'])
+             ->name('candidaturas.por-oportunidade');
+
+    });
 });
-
-// Assumindo que a listagem de candidatos é pública
-Route::apiResource('candidatos', CandidatoController::class);
