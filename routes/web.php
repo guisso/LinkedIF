@@ -2,18 +2,22 @@
 
 use Illuminate\Support\Facades\Route;
 
-// ==================== ROTAS DE VISUALIZAÇÃO (WEB) ====================
-
+// Rota raiz: Manda diretamente para o login (sem middleware)
 Route::get('/', function () {
-    return redirect()->route('login.form');
+    return view('auth.login');
 });
 
-// Tela de login
+// Tela de Login
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login.form');
 
-// Tela de registro
-Route::get('/register', function () {
+// Tela de Cadastro
+Route::get('/cadastro', function () {
     return view('auth.register');
 })->name('register.form');
+
+// Tela de Dashboard (HOME)
+Route::get('/home', function () {
+    return view('dashboard');
+})->name('home');

@@ -10,9 +10,9 @@ return new class extends Migration {
             $table->id();
 
             // Chave estrangeira para conectar ao candidato
-            $table->foreignId('candidato_id')
-                ->constrained('candidatos') // 'constrained' usa as convenções do Laravel
-                ->onDelete('cascade'); // Se um candidato for apagado, suas experiências também serão.
+            $table->foreignId('candidato_id') // Nome da coluna na tabela experiencias
+                ->constrained('candidatos', 'usuario_id') // Tabela e coluna de referência
+                ->onDelete('cascade');
 
             $table->string('instituicao', 100);
             $table->string('funcao', 100);

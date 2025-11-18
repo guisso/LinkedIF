@@ -10,6 +10,8 @@ enum TipoPerfil: int
     case ADMINISTRADOR = 1;
     case EDITOR = 2;
     case CANDIDATO = 3;
+    case EMPRESA = 4;
+    case PROFESSOR = 5;
 
     /**
      * Retorna todos os valores do enum.
@@ -28,10 +30,12 @@ enum TipoPerfil: int
      */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ADMINISTRADOR => 'Administrador',
             self::EDITOR => 'Editor',
             self::CANDIDATO => 'Candidato',
+            self::EMPRESA => 'Empresa',
+            self::PROFESSOR => 'Professor',
         };
     }
 }

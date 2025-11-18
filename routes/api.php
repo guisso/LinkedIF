@@ -5,38 +5,56 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\CandidaturaController;
 
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Aqui são registradas as rotas da API. 
+| O RouteServiceProvider carrega este arquivo e aplica o prefixo "api".
+| Adicionamos um grupo "v1" para versionamento: /api/v1/...
+|
+*/
+
 Route::prefix('v1')->group(function () {
 
-    //ROTAS PÚBLICAS
-    Route::post('/registro', [AuthController::class, 'registro']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/ativar-conta', [AuthController::class, 'ativarConta']);
-    Route::post('/solicitar-recuperacao-senha', [AuthController::class, 'solicitarRecuperacaoSenha']);
-    Route::post('/redefinir-senha', [AuthController::class, 'redefinirSenha']);
+     // ========================================================================
+     // ROTAS PÚBLICAS (Não exigem login)
+     // ========================================================================
 
-    // Candidatos são públicos (currículo aberto)
-    Route::apiResource('candidatos', CandidatoController::class)->only(['index', 'show']);
+     // Autenticação e Cadastro
+     Route::post('/registro', [AuthController::class, 'registro'])->name('auth.registro');
+     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+     Route::post('/ativar-conta', [AuthController::class, 'ativarConta'])->name('auth.ativar');
+     Route::post('/solicitar-recuperacao-senha', [AuthController::class, 'solicitarRecuperacaoSenha'])->name('password.request');
+     Route::post('/redefinir-senha', [AuthController::class, 'redefinirSenha'])->name('password.reset');
+
+     // Listagem Pública (Ex: Candidatos com currículo visível)
+     Route::apiResource('candidatos', CandidatoController::class)->only(['index', 'show']);
 
 
-    //ROTAS AUTENTICADAS
-    Route::middleware('auth:sanctum')->group(function () {
+     // ========================================================================
+     // ROTAS PROTEGIDAS (Exigem Token Bearer)
+     // ========================================================================
 
-        // Auth & Perfil
-        Route::post('/logout', [AuthController::class, 'logout']);
-        Route::get('/perfil', [AuthController::class, 'perfil']);
-        Route::post('/renovar-token', [AuthController::class, 'renovarToken']);
+     Route::middleware('auth:sanctum')->group(function () {
 
-        //CANDIDATURAS
-        Route::apiResource('candidaturas', CandidaturaController::class)
-             ->except(['index']); // vamos controlar index manualmente
+          // Gestão da Conta
+          Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+          Route::get('/perfil', [AuthController::class, 'perfil'])->name('auth.perfil');
+          Route::post('/renovar-token', [AuthController::class, 'renovarToken'])->name('auth.refresh');
 
-        // Candidato vê suas próprias candidaturas
-        Route::get('/minhas-candidaturas', [CandidaturaController::class, 'minhas'])
-             ->name('candidaturas.minhas');
+          // Candidaturas (Processo Seletivo)
+          Route::apiResource('candidaturas', CandidaturaController::class)
+               ->except(['index']); // Index é customizado abaixo
 
-        // Editor vê candidaturas de uma oportunidade específica
-        Route::get('/oportunidades/{oportunidadeId}/candidaturas', [CandidaturaController::class, 'porOportunidade'])
-             ->name('candidaturas.por-oportunidade');
+          // [Candidato] Ver histórico de candidaturas
+          Route::get('/minhas-candidaturas', [CandidaturaController::class, 'minhas'])
+               ->name('candidaturas.minhas');
 
-    });
+          // [Editor/Empresa] Ver candidatos de uma vaga específica
+          Route::get('/oportunidades/{oportunidadeId}/candidaturas', [CandidaturaController::class, 'porOportunidade'])
+               ->name('candidaturas.por-oportunidade');
+
+     });
 });

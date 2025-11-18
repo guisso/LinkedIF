@@ -4,282 +4,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Registro - LinkedIF</title>
+    <title>Cadastro - LinkedIF</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background-color: #f8f9fa;
         }
 
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            max-width: 450px;
-            width: 100%;
+        .card-registro {
+            max-width: 700px;
+            margin: 50px auto;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .error {
-            color: #e74c3c;
-            font-size: 12px;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .error.show {
-            display: block;
-        }
-
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            padding: 12px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .success.show {
-            display: block;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 
 <body>
+
     <div class="container">
-        <h1>🎓 LinkedIF</h1>
-        <p class="subtitle">Criar nova conta</p>
-
-        <div id="successMessage" class="success"></div>
-
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="nome">Nome completo</label>
-                <input type="text" id="nome" name="nome" required maxlength="45">
-                <div id="nomeError" class="error"></div>
+        <div class="card card-registro shadow-lg border-0">
+            <div class="card-header bg-success text-white text-center py-3">
+                <h4 class="mb-0">Crie sua conta no LinkedIF</h4>
             </div>
+            <div class="card-body p-4">
 
-            <div class="form-group">
-                <label for="email">E-mail</label>
-                <input type="email" id="email" name="email" required maxlength="250">
-                <div id="emailError" class="error"></div>
+                <div id="alert-area"></div>
+
+                <form id="formRegistro">
+
+                    <div class="mb-4 p-3 bg-light border rounded">
+                        <label class="form-label fw-bold text-success">Primeiro, quem é você?</label>
+                        <select class="form-select form-select-lg" id="tipo_perfil" name="tipo_perfil" required>
+                            <option value="" selected disabled>Selecione seu perfil...</option>
+                            <option value="ALUNO">🎓 Aluno (Discente)</option>
+                            <option value="EMPRESA">🏢 Empresa (Parceiro)</option>
+                            <option value="PROFESSOR">📚 Professor (Docente)</option>
+                        </select>
+                        <div class="form-text">Os campos abaixo mudarão conforme sua escolha.</div>
+                    </div>
+
+                    <h5 class="mb-3 text-secondary">Dados Gerais</h5>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Nome Completo / Razão Social <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nome" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Telefone <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="telefone" placeholder="(38) 99999-9999" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Data de Nascimento (ou Fundação) <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" name="nascimento" required>
+                        </div>
+                        <div class="col-md-6 mb-3 pt-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="whatsapp" value="1" id="whatsapp">
+                                <label class="form-check-label" for="whatsapp">Este número é WhatsApp?</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="campos-aluno" class="hidden p-3 mb-4 border border-primary border-opacity-50 rounded bg-primary-subtle">
+                        <h6 class="text-primary fw-bold">🎓 Dados Acadêmicos</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Qual seu Curso? <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="input-curso" name="curso" placeholder="Ex: Ciência da Computação">
+                        </div>
+                    </div>
+
+                    <div id="campos-empresa" class="hidden p-3 mb-4 border border-warning border-opacity-50 rounded bg-warning-subtle">
+                        <h6 class="text-warning-emphasis fw-bold">🏢 Dados Empresariais</h6>
+                        <div class="mb-3">
+                            <label class="form-label">CNPJ <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="input-cnpj" name="cnpj" placeholder="Apenas números (14 dígitos)">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição da Empresa</label>
+                            <textarea class="form-control" id="input-descricao" name="descricao" rows="3" placeholder="Fale um pouco sobre a empresa..."></textarea>
+                        </div>
+                    </div>
+
+                    <hr>
+                    <h5 class="mb-3 text-secondary">Dados de Acesso</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nome de Usuário (Login) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="nome_usuario" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Senha <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control" name="senha" minlength="6" required>
+                            <div class="form-text">Mínimo de 6 caracteres.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold" id="btn-submit">CADASTRAR</button>
+                    </div>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label for="telefone">Telefone</label>
-                <input type="tel" id="telefone" name="telefone" required maxlength="16">
-                <div id="telefoneError" class="error"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="nascimento">Data de nascimento</label>
-                <input type="date" id="nascimento" name="nascimento" required>
-                <div id="nascimentoError" class="error"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="nome_usuario">Nome de usuário</label>
-                <input type="text" id="nome_usuario" name="nome_usuario" required maxlength="20">
-                <div id="nome_usuarioError" class="error"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="senha">Senha</label>
-                <input type="password" id="senha" name="senha" required minlength="6">
-                <div id="senhaError" class="error"></div>
-            </div>
-
-            <button type="submit" id="submitBtn">Registrar</button>
-        </form>
-
-        <div class="login-link">
-            Já tem uma conta? <a href="{{ route('login.form') }}">Fazer login</a>
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('registerForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const successMessage = document.getElementById('successMessage');
+        // --- Elementos do DOM ---
+        const selectPerfil = document.getElementById('tipo_perfil');
+        const divAluno = document.getElementById('campos-aluno');
+        const divEmpresa = document.getElementById('campos-empresa');
+        const inputCurso = document.getElementById('input-curso');
+        const inputCnpj = document.getElementById('input-cnpj');
 
-        // Limpar mensagens de erro
-        function clearErrors() {
-            document.querySelectorAll('.error').forEach(el => {
-                el.classList.remove('show');
-                el.textContent = '';
-            });
-            successMessage.classList.remove('show');
-            successMessage.textContent = '';
-        }
+        const form = document.getElementById('formRegistro');
+        const alertArea = document.getElementById('alert-area');
+        const btnSubmit = document.getElementById('btn-submit');
 
-        // Mostrar erros
-        function showErrors(errors) {
-            for (const [field, messages] of Object.entries(errors)) {
-                const errorEl = document.getElementById(`${field}Error`);
-                if (errorEl) {
-                    errorEl.textContent = messages[0];
-                    errorEl.classList.add('show');
-                }
+        // --- 1. Lógica de Mostrar/Esconder Campos ---
+        selectPerfil.addEventListener('change', function () {
+            const valor = this.value;
+
+            // 1. Esconde tudo primeiro
+            divAluno.classList.add('hidden');
+            divEmpresa.classList.add('hidden');
+
+            // 2. Remove a obrigatoriedade dos campos escondidos (para não travar o HTML5 validation)
+            inputCurso.required = false;
+            inputCnpj.required = false;
+
+            // 3. Mostra o que foi selecionado e torna obrigatório
+            if (valor === 'ALUNO') {
+                divAluno.classList.remove('hidden');
+                inputCurso.required = true; // Curso é obrigatório para aluno
             }
-        }
+            else if (valor === 'EMPRESA') {
+                divEmpresa.classList.remove('hidden');
+                inputCnpj.required = true; // CNPJ é obrigatório para empresa
+            }
+            // Nota: Professor usa a lógica padrão (sem campos extras obrigatórios por enquanto)
+        });
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearErrors();
+        // --- 2. Envio do Formulário para a API ---
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault(); // Impede o recarregamento da página
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Registrando...';
+            // UI de carregamento
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+            alertArea.innerHTML = '';
 
-            const formData = {
-                nome: document.getElementById('nome').value,
-                email: document.getElementById('email').value,
-                telefone: document.getElementById('telefone').value,
-                nascimento: document.getElementById('nascimento').value,
-                nome_usuario: document.getElementById('nome_usuario').value,
-                senha: document.getElementById('senha').value,
-            };
+            // Coleta os dados
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Corrige o checkbox (transforma em booleano)
+            data.whatsapp = formData.get('whatsapp') ? true : false;
 
             try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-
-                const response = await fetch('/api/auth/registro', {
+                // Faz a requisição para o seu AuthController
+                const response = await fetch('http://127.0.0.1:8000/api/v1/registro', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(formData),
-                    signal: controller.signal
+                    body: JSON.stringify(data)
                 });
 
-                clearTimeout(timeoutId);
-                const data = await response.json();
+                const result = await response.json();
 
                 if (response.ok) {
-                    successMessage.textContent = data.message || 'Registro realizado com sucesso!';
-                    successMessage.classList.add('show');
-                    form.reset();
+                    // SUCESSO 201
+                    alertArea.innerHTML = `
+                    <div class="alert alert-success border-success">
+                        <strong>Sucesso!</strong> ${result.message}
+                    </div>`;
 
-                    // Redirecionar para login após 2 segundos
-                    setTimeout(() => {
-                        window.location.href = '{{ route("login.form") }}';
-                    }, 2000);
+                    // Limpa o formulário
+                    form.reset();
+                    divAluno.classList.add('hidden');
+                    divEmpresa.classList.add('hidden');
+
+                    // Rola para o topo para ver a mensagem
+                    window.scrollTo(0, 0);
+
                 } else {
-                    if (data.errors) {
-                        showErrors(data.errors);
-                    } else {
-                        alert(data.message || 'Erro ao realizar registro');
+                    // ERRO (Validação 422 ou Servidor 500)
+                    let errorMsg = result.message || 'Erro desconhecido.';
+
+                    // Se tiver lista de erros de validação
+                    if (result.errors) {
+                        errorMsg += '<ul class="mt-2 mb-0">';
+                        for (const [key, value] of Object.entries(result.errors)) {
+                            errorMsg += `<li>${value}</li>`;
+                        }
+                        errorMsg += '</ul>';
                     }
+
+                    alertArea.innerHTML = `
+                    <div class="alert alert-danger border-danger">
+                        <strong>Erro:</strong> ${errorMsg}
+                    </div>`;
+                    window.scrollTo(0, 0);
                 }
+
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    alert('Requisição demorou muito. Verifique sua conexão ou tente novamente.');
-                } else {
-                    alert('Erro de conexão. Tente novamente.');
-                }
-                console.error('Erro:', error);
+                console.error('Erro de rede:', error);
+                alertArea.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>Erro de Conexão:</strong> Não foi possível contactar o servidor. Verifique se o Laravel está rodando.
+                </div>`;
+                window.scrollTo(0, 0);
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Registrar';
+                // Restaura o botão
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = 'CADASTRAR';
             }
         });
     </script>
+
 </body>
 
 </html>
