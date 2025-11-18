@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +12,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,7 +22,7 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .container {
             background: white;
             padding: 40px;
@@ -30,25 +31,25 @@
             max-width: 450px;
             width: 100%;
         }
-        
+
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 10px;
             font-size: 28px;
         }
-        
+
         .subtitle {
             text-align: center;
             color: #666;
             margin-bottom: 30px;
             font-size: 14px;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
             margin-bottom: 5px;
@@ -56,8 +57,9 @@
             font-weight: 500;
             font-size: 14px;
         }
-        
-        input, select {
+
+        input,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
@@ -65,23 +67,24 @@
             font-size: 14px;
             transition: border-color 0.3s;
         }
-        
-        input:focus, select:focus {
+
+        input:focus,
+        select:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         .error {
             color: #e74c3c;
             font-size: 12px;
             margin-top: 5px;
             display: none;
         }
-        
+
         .error.show {
             display: block;
         }
-        
+
         .success {
             background-color: #d4edda;
             color: #155724;
@@ -90,11 +93,11 @@
             margin-bottom: 20px;
             display: none;
         }
-        
+
         .success.show {
             display: block;
         }
-        
+
         button {
             width: 100%;
             padding: 12px;
@@ -107,41 +110,42 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
+
         button:hover {
             transform: translateY(-2px);
         }
-        
+
         button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
         }
-        
+
         .login-link {
             text-align: center;
             margin-top: 20px;
             color: #666;
             font-size: 14px;
         }
-        
+
         .login-link a {
             color: #667eea;
             text-decoration: none;
             font-weight: 600;
         }
-        
+
         .login-link a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎓 LinkedIF</h1>
         <p class="subtitle">Criar nova conta</p>
-        
+
         <div id="successMessage" class="success"></div>
-        
+
         <form id="registerForm">
             <div class="form-group">
                 <label for="nome">Nome completo</label>
@@ -166,32 +170,32 @@
                 <input type="date" id="nascimento" name="nascimento" required>
                 <div id="nascimentoError" class="error"></div>
             </div>
-            
+
             <div class="form-group">
                 <label for="nome_usuario">Nome de usuário</label>
                 <input type="text" id="nome_usuario" name="nome_usuario" required maxlength="20">
                 <div id="nome_usuarioError" class="error"></div>
             </div>
-            
+
             <div class="form-group">
                 <label for="senha">Senha</label>
                 <input type="password" id="senha" name="senha" required minlength="6">
                 <div id="senhaError" class="error"></div>
             </div>
-            
+
             <button type="submit" id="submitBtn">Registrar</button>
         </form>
-        
+
         <div class="login-link">
             Já tem uma conta? <a href="{{ route('login.form') }}">Fazer login</a>
         </div>
     </div>
-    
+
     <script>
         const form = document.getElementById('registerForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
-        
+
         // Limpar mensagens de erro
         function clearErrors() {
             document.querySelectorAll('.error').forEach(el => {
@@ -201,7 +205,7 @@
             successMessage.classList.remove('show');
             successMessage.textContent = '';
         }
-        
+
         // Mostrar erros
         function showErrors(errors) {
             for (const [field, messages] of Object.entries(errors)) {
@@ -212,14 +216,14 @@
                 }
             }
         }
-        
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             clearErrors();
-            
+
             submitBtn.disabled = true;
             submitBtn.textContent = 'Registrando...';
-            
+
             const formData = {
                 nome: document.getElementById('nome').value,
                 email: document.getElementById('email').value,
@@ -228,11 +232,11 @@
                 nome_usuario: document.getElementById('nome_usuario').value,
                 senha: document.getElementById('senha').value,
             };
-            
+
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 segundos timeout
-                
+
                 const response = await fetch('/api/auth/registro', {
                     method: 'POST',
                     headers: {
@@ -243,15 +247,15 @@
                     body: JSON.stringify(formData),
                     signal: controller.signal
                 });
-                
+
                 clearTimeout(timeoutId);
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     successMessage.textContent = data.message || 'Registro realizado com sucesso!';
                     successMessage.classList.add('show');
                     form.reset();
-                    
+
                     // Redirecionar para login após 2 segundos
                     setTimeout(() => {
                         window.location.href = '{{ route("login.form") }}';
@@ -277,4 +281,5 @@
         });
     </script>
 </body>
+
 </html>

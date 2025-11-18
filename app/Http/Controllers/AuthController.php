@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
+// <-- MUDANÇA 1: Importar classes de E-mail
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EnviarVerificacaoEmail;
+
 /**
  * Controller responsável pela autenticação de usuários.
  * Gerencia registro, login, logout e operações relacionadas a tokens.
@@ -19,8 +23,7 @@ class AuthController extends Controller
 {
     /**
      * Registra um novo usuário no sistema.
-     * 
-     * @param Request $request
+     * * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function registro(Request $request)
@@ -73,20 +76,30 @@ class AuthController extends Controller
             $usuario->setIdade($idade);
             $usuario->save();
 
+            // <-- MUDANÇA 2: Gerar o código de ativação
+            $codigoAtivacao = (string) Str::uuid();
+
             // Cria a credencial vinculada ao usuário
             $credencial = new Credencial();
             $credencial->usuario_id = $usuario->getId();
             $credencial->setNomeUsuario($request->nome_usuario);
             $credencial->setSenha(Hash::make($request->senha));
             $credencial->setTipoPerfil(TipoPerfil::CANDIDATO);
-            $credencial->setAtivo(false); 
+            $credencial->setAtivo(false);
+
+            // <-- MUDANÇA 3: Salvar o código no banco
+            $credencial->setCodigo($codigoAtivacao);
             $credencial->save();
+
+            // <-- MUDANÇA 4: Enviar o e-mail
+            Mail::to($usuario->getEmail())->send(new EnviarVerificacaoEmail($usuario, $codigoAtivacao));
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cadastro realizado com sucesso!',
+                // <-- MUDANÇA 5: Atualizar mensagem de sucesso
+                'message' => 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar a conta.',
                 'data' => [
                     'usuario' => [
                         'id' => $usuario->getId(),
@@ -112,10 +125,7 @@ class AuthController extends Controller
 
     /**
      * Realiza o login do usuário.
-     * Gera um token de autenticação que expira em 1 hora.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function login(Request $request)
     {
@@ -190,10 +200,7 @@ class AuthController extends Controller
 
     /**
      * Realiza o logout do usuário.
-     * Remove o token de autenticação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function logout(Request $request)
     {
@@ -228,9 +235,7 @@ class AuthController extends Controller
 
     /**
      * Ativa a conta do usuário usando o código de ativação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function ativarConta(Request $request)
     {
@@ -284,10 +289,7 @@ class AuthController extends Controller
 
     /**
      * Solicita recuperação de senha.
-     * Gera um novo código de recuperação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function solicitarRecuperacaoSenha(Request $request)
     {
@@ -339,9 +341,7 @@ class AuthController extends Controller
 
     /**
      * Redefine a senha usando o código de recuperação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function redefinirSenha(Request $request)
     {
@@ -398,9 +398,7 @@ class AuthController extends Controller
 
     /**
      * Retorna os dados do usuário autenticado.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function perfil(Request $request)
     {
@@ -437,9 +435,7 @@ class AuthController extends Controller
 
     /**
      * Renova o token de autenticação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function renovarToken(Request $request)
     {
@@ -483,9 +479,7 @@ class AuthController extends Controller
 
     /**
      * Gera um token único para o usuário.
-     * 
-     * @param Credencial $credencial
-     * @return string
+     * (Seu código original, que já está correto)
      */
     private function gerarToken(Credencial $credencial): string
     {

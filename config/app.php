@@ -155,11 +155,6 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-        //App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class, // (Mantenha comentado se estiver)
-        // App\Providers\EventServiceProvider::class,
-
-        // ESTA É A LINHA QUE VOCÊ ADICIONOU, NO LUGAR CERTO:
         App\Providers\RouteServiceProvider::class,
 
     ],
