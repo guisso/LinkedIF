@@ -9,8 +9,9 @@ return new class extends Migration {
         Schema::create('competencias', function (Blueprint $table) {
             $table->id();
 
+            // CORREÇÃO: Aponta para 'usuario_id' na tabela 'candidatos'
             $table->foreignId('candidato_id')
-                ->constrained('candidatos')
+                ->constrained('candidatos', 'usuario_id') // <--- Mudança aqui
                 ->onDelete('cascade');
 
             $table->string('descricao', 150);

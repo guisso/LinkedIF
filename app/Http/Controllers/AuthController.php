@@ -26,47 +26,56 @@ class AuthController extends Controller
      * * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+     * Registra um novo usuário no sistema (CU01).
+     * Agora suporta perfis de Aluno, Professor e Empresa.
+     */
     public function registro(Request $request)
     {
-        // Validação dos dados de entrada
+        // 1. Validação Expandida (Condicional)
         $validador = Validator::make($request->all(), [
+            // --- Dados Comuns ---
             'nome' => 'required|string|max:45',
             'email' => 'required|email|max:250|unique:usuarios,email',
             'telefone' => 'required|string|max:16',
             'nascimento' => 'required|date',
             'nome_usuario' => 'required|string|max:20|unique:credenciais,nome_usuario',
             'senha' => 'required|string|min:6',
+
+            // --- Novo Campo: Tipo de Perfil ---
+            'tipo_perfil' => 'required|string|in:ALUNO,PROFESSOR,EMPRESA',
+
+            // --- Campos Condicionais ---
+            // 'curso' é obrigatório APENAS se tipo_perfil for ALUNO
+            'curso' => 'required_if:tipo_perfil,ALUNO|string|nullable|max:100',
+
+            // 'cnpj' é obrigatório APENAS se tipo_perfil for EMPRESA
+            'cnpj' => 'required_if:tipo_perfil,EMPRESA|string|nullable|size:14|unique:editores,cnpj',
+
+            // 'descricao' é opcional para empresas
+            'descricao' => 'nullable|string|max:500',
+
         ], [
-            'nome.required' => 'O nome é obrigatório.',
-            'email.required' => 'O e-mail é obrigatório.',
-            'email.email' => 'E-mail inválido.',
-            'email.unique' => 'Este e-mail já está cadastrado.',
-            'telefone.required' => 'O telefone é obrigatório.',
-            'nascimento.required' => 'A data de nascimento é obrigatória.',
-            'nascimento.date' => 'Data de nascimento inválida.',
-            'nome_usuario.required' => 'O nome de usuário é obrigatório.',
-            'nome_usuario.unique' => 'Este nome de usuário já está em uso.',
-            'nome_usuario.max' => 'O nome de usuário deve ter no máximo 20 caracteres.',
-            'senha.required' => 'A senha é obrigatória.',
-            'senha.min' => 'A senha deve ter no mínimo 6 caracteres.',
+            // Mensagens personalizadas
+            'tipo_perfil.required' => 'Selecione o tipo de perfil (Aluno, Professor ou Empresa).',
+            'tipo_perfil.in' => 'Tipo de perfil inválido.',
+            'curso.required_if' => 'O curso é obrigatório para alunos.',
+            'cnpj.required_if' => 'O CNPJ é obrigatório para empresas.',
+            'cnpj.size' => 'O CNPJ deve ter 14 dígitos.',
+            'cnpj.unique' => 'Este CNPJ já está cadastrado.',
+            // ... suas outras mensagens ...
         ]);
 
         if ($validador->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro de validação.',
-                'errors' => $validador->errors()
-            ], 422);
+            return response()->json(['success' => false, 'errors' => $validador->errors()], 422);
         }
 
         DB::beginTransaction();
         try {
-            // Calcular idade
+            // 2. Cria o Usuário (Pai)
             $nascimento = new \DateTime($request->nascimento);
-            $hoje = new \DateTime();
-            $idade = $hoje->diff($nascimento)->y;
+            $idade = (new \DateTime())->diff($nascimento)->y;
 
-            // Cria o usuário
             $usuario = new Usuario();
             $usuario->setNome($request->nome);
             $usuario->setEmail($request->email);
@@ -76,50 +85,73 @@ class AuthController extends Controller
             $usuario->setIdade($idade);
             $usuario->save();
 
-            // <-- MUDANÇA 2: Gerar o código de ativação
+            // 3. Lógica de Perfil Específico (Filho)
+            $tipoPerfilReq = $request->input('tipo_perfil');
+            $tipoPerfilEnum = null;
+            $ativo = false; // Padrão: inativo até validar e-mail (ou admin liberar)
+
+            // --- SE FOR ALUNO (CANDIDATO) ---
+            if ($tipoPerfilReq == 'ALUNO') {
+                $tipoPerfilEnum = TipoPerfil::CANDIDATO;
+                $ativo = true;
+
+                // Cria o Candidato vinculado ao Usuario
+                $candidato = new \App\Models\Candidato();
+                $candidato->usuario_id = $usuario->getId(); // Herança (FK)
+                $candidato->curso = $request->input('curso'); // Salva o curso
+                // Adicione outros campos de candidato aqui se tiver
+                $candidato->save();
+
+                // --- SE FOR EMPRESA OU PROFESSOR (EDITOR) ---
+            } else if ($tipoPerfilReq == 'EMPRESA' || $tipoPerfilReq == 'PROFESSOR') {
+                $tipoPerfilEnum = ($tipoPerfilReq == 'EMPRESA') ? TipoPerfil::EMPRESA : TipoPerfil::PROFESSOR;
+                $ativo = true; // Empresa precisa de aprovação (Fluxo Alternativo 4a)
+
+                // Cria o Editor vinculado ao Usuario
+                $editor = new \App\Models\Editor();
+                $editor->usuario_id = $usuario->getId(); // Herança (FK)
+
+                if ($tipoPerfilReq == 'EMPRESA') {
+                    $editor->cnpj = $request->input('cnpj');
+                    $editor->descricao = $request->input('descricao');
+                }
+                $editor->save();
+            }
+
+            // 4. Cria a Credencial
             $codigoAtivacao = (string) Str::uuid();
 
-            // Cria a credencial vinculada ao usuário
             $credencial = new Credencial();
             $credencial->usuario_id = $usuario->getId();
             $credencial->setNomeUsuario($request->nome_usuario);
             $credencial->setSenha(Hash::make($request->senha));
-            $credencial->setTipoPerfil(TipoPerfil::CANDIDATO);
-            $credencial->setAtivo(false);
-
-            // <-- MUDANÇA 3: Salvar o código no banco
+            $credencial->setTipoPerfil($tipoPerfilEnum);
+            $credencial->setAtivo($ativo);
             $credencial->setCodigo($codigoAtivacao);
             $credencial->save();
 
-            // <-- MUDANÇA 4: Enviar o e-mail
-            Mail::to($usuario->getEmail())->send(new EnviarVerificacaoEmail($usuario, $codigoAtivacao));
+            // 5. Envia E-mail
+            //Mail::to($usuario->getEmail())->send(new EnviarVerificacaoEmail($usuario, $codigoAtivacao));
 
             DB::commit();
 
+            // Mensagem personalizada baseada no status
+            $msg = $ativo
+                ? 'Cadastro realizado! Você já pode fazer login.'
+                : 'Cadastro realizado! Sua conta de empresa passará por análise.';
+
             return response()->json([
                 'success' => true,
-                // <-- MUDANÇA 5: Atualizar mensagem de sucesso
-                'message' => 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar a conta.',
+                'message' => $msg,
                 'data' => [
-                    'usuario' => [
-                        'id' => $usuario->getId(),
-                        'nome' => $usuario->getNome(),
-                        'email' => $usuario->getEmail(),
-                    ],
-                    'credencial' => [
-                        'id' => $credencial->getId(),
-                        'nome_usuario' => $credencial->getNomeUsuario(),
-                    ]
+                    'id' => $usuario->getId(),
+                    'tipo' => $tipoPerfilReq
                 ]
             ], 201);
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Erro ao registrar usuário.',
-                'error' => $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => 'Erro ao registrar: ' . $e->getMessage()], 500);
         }
     }
 

@@ -9,12 +9,19 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 // 2. Herda de Entidade, não de Model
 class Candidato extends Entidade
 {
-    // HasFactory já vem da classe Entidade, mas é boa prática
-    // mantê-lo aqui se você for usar factories específicas.
-    // use HasFactory; 
+    // 1. Defina o nome da chave primária correta
+    protected $primaryKey = 'usuario_id';
+
+    // 2. Avise que ela NÃO é auto-incrementável (pois vem do Usuario pai)
+    public $incrementing = false;
+
+    // 3. Defina o tipo da chave (geralmente int, mas bom garantir)
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'foto',
+        'usuario_id',
+        'curso',
+        'foto'
     ];
 
     public function experiencias(): HasMany

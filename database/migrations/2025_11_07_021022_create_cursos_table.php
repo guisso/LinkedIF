@@ -9,9 +9,12 @@ return new class extends Migration {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
 
+            // CORREÇÃO AQUI:
+            // Aponta para a tabela 'candidatos', coluna 'usuario_id'
             $table->foreignId('candidato_id')
-                ->constrained('candidatos')
+                ->constrained('candidatos', 'usuario_id')
                 ->onDelete('cascade');
+
 
             $table->string('nome', 20); // O diagrama especifica 20
             $table->smallInteger('ingresso'); // 'Short' -> 'smallInteger'
