@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Credencial;
+use App\Models\Usuario;
 use App\Models\Enums\TipoPerfil;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+
+// <-- MUDANÇA 1: Importar classes de E-mail
+use Illuminate\Support\Facades\Mail;
+use App\Mail\EnviarVerificacaoEmail;
 
 /**
  * Controller responsável pela autenticação de usuários.
@@ -17,26 +23,32 @@ class AuthController extends Controller
 {
     /**
      * Registra um novo usuário no sistema.
-     * 
-     * @param Request $request
+     * * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function registro(Request $request)
     {
         // Validação dos dados de entrada
         $validador = Validator::make($request->all(), [
+            'nome' => 'required|string|max:45',
+            'email' => 'required|email|max:250|unique:usuarios,email',
+            'telefone' => 'required|string|max:16',
+            'nascimento' => 'required|date',
             'nome_usuario' => 'required|string|max:20|unique:credenciais,nome_usuario',
-            'senha' => 'required|string|min:8|confirmed',
-            'tipo_perfil' => 'required|string|in:ADMINISTRADOR,CANDIDATO,EMPRESA',
+            'senha' => 'required|string|min:6',
         ], [
+            'nome.required' => 'O nome é obrigatório.',
+            'email.required' => 'O e-mail é obrigatório.',
+            'email.email' => 'E-mail inválido.',
+            'email.unique' => 'Este e-mail já está cadastrado.',
+            'telefone.required' => 'O telefone é obrigatório.',
+            'nascimento.required' => 'A data de nascimento é obrigatória.',
+            'nascimento.date' => 'Data de nascimento inválida.',
             'nome_usuario.required' => 'O nome de usuário é obrigatório.',
             'nome_usuario.unique' => 'Este nome de usuário já está em uso.',
             'nome_usuario.max' => 'O nome de usuário deve ter no máximo 20 caracteres.',
             'senha.required' => 'A senha é obrigatória.',
-            'senha.min' => 'A senha deve ter no mínimo 8 caracteres.',
-            'senha.confirmed' => 'A confirmação de senha não corresponde.',
-            'tipo_perfil.required' => 'O tipo de perfil é obrigatório.',
-            'tipo_perfil.in' => 'Tipo de perfil inválido.',
+            'senha.min' => 'A senha deve ter no mínimo 6 caracteres.',
         ]);
 
         if ($validador->fails()) {
@@ -47,27 +59,62 @@ class AuthController extends Controller
             ], 422);
         }
 
+        DB::beginTransaction();
         try {
-            // Cria a credencial com senha criptografada
+            // Calcular idade
+            $nascimento = new \DateTime($request->nascimento);
+            $hoje = new \DateTime();
+            $idade = $hoje->diff($nascimento)->y;
+
+            // Cria o usuário
+            $usuario = new Usuario();
+            $usuario->setNome($request->nome);
+            $usuario->setEmail($request->email);
+            $usuario->setTelefone($request->telefone);
+            $usuario->setWhatsApp($request->whatsapp ?? false);
+            $usuario->setNascimento(\Carbon\Carbon::parse($request->nascimento));
+            $usuario->setIdade($idade);
+            $usuario->save();
+
+            // <-- MUDANÇA 2: Gerar o código de ativação
+            $codigoAtivacao = (string) Str::uuid();
+
+            // Cria a credencial vinculada ao usuário
             $credencial = new Credencial();
+            $credencial->usuario_id = $usuario->getId();
             $credencial->setNomeUsuario($request->nome_usuario);
-            $credencial->setSenha(Hash::make($request->senha)); // Senha criptografada
-            $credencial->setTipoPerfil(TipoPerfil::from($request->tipo_perfil));
-            $credencial->setAtivo(false); // Inicialmente inativo até ativação
+            $credencial->setSenha(Hash::make($request->senha));
+            $credencial->setTipoPerfil(TipoPerfil::CANDIDATO);
+            $credencial->setAtivo(false);
+
+            // <-- MUDANÇA 3: Salvar o código no banco
+            $credencial->setCodigo($codigoAtivacao);
             $credencial->save();
+
+            // <-- MUDANÇA 4: Enviar o e-mail
+            Mail::to($usuario->getEmail())->send(new EnviarVerificacaoEmail($usuario, $codigoAtivacao));
+
+            DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Usuário registrado com sucesso. Verifique seu e-mail para ativar a conta.',
+                // <-- MUDANÇA 5: Atualizar mensagem de sucesso
+                'message' => 'Cadastro realizado com sucesso! Verifique seu e-mail para ativar a conta.',
                 'data' => [
-                    'id' => $credencial->getId(),
-                    'nome_usuario' => $credencial->getNomeUsuario(),
-                    'tipo_perfil' => $credencial->getTipoPerfil()->value,
-                    'codigo_ativacao' => $credencial->getCodigo(), // Enviar por e-mail
+                    'usuario' => [
+                        'id' => $usuario->getId(),
+                        'nome' => $usuario->getNome(),
+                        'email' => $usuario->getEmail(),
+                    ],
+                    'credencial' => [
+                        'id' => $credencial->getId(),
+                        'nome_usuario' => $credencial->getNomeUsuario(),
+                    ]
                 ]
             ], 201);
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao registrar usuário.',
@@ -78,10 +125,7 @@ class AuthController extends Controller
 
     /**
      * Realiza o login do usuário.
-     * Gera um token de autenticação que expira em 1 hora.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function login(Request $request)
     {
@@ -156,10 +200,7 @@ class AuthController extends Controller
 
     /**
      * Realiza o logout do usuário.
-     * Remove o token de autenticação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function logout(Request $request)
     {
@@ -194,9 +235,7 @@ class AuthController extends Controller
 
     /**
      * Ativa a conta do usuário usando o código de ativação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function ativarConta(Request $request)
     {
@@ -250,10 +289,7 @@ class AuthController extends Controller
 
     /**
      * Solicita recuperação de senha.
-     * Gera um novo código de recuperação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function solicitarRecuperacaoSenha(Request $request)
     {
@@ -305,9 +341,7 @@ class AuthController extends Controller
 
     /**
      * Redefine a senha usando o código de recuperação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function redefinirSenha(Request $request)
     {
@@ -364,9 +398,7 @@ class AuthController extends Controller
 
     /**
      * Retorna os dados do usuário autenticado.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function perfil(Request $request)
     {
@@ -403,9 +435,7 @@ class AuthController extends Controller
 
     /**
      * Renova o token de autenticação.
-     * 
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * (Seu código original, que já está correto)
      */
     public function renovarToken(Request $request)
     {
@@ -449,9 +479,7 @@ class AuthController extends Controller
 
     /**
      * Gera um token único para o usuário.
-     * 
-     * @param Credencial $credencial
-     * @return string
+     * (Seu código original, que já está correto)
      */
     private function gerarToken(Credencial $credencial): string
     {
