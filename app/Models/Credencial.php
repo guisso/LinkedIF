@@ -90,6 +90,17 @@ class Credencial extends Entidade
         });
     }
 
+    // ==================== RELAÇÕES ====================
+
+    /**
+     * Relação 1:1 com Usuario.
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(Usuario::class);
+    }
+
     // ==================== GETTERS ====================
 
     /**
