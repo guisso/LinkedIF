@@ -143,7 +143,7 @@ Este projeto está sendo desenvolvido e orientado pela seguinte equipe:
     <td align="center"><a href="https://github.com/VitorRibe"><img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/VitorRibe?v=4" width="100px;" alt=""/><br /><sub><b>João Vitor Ribeiro Botelho</b></sub></a><br /></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/odavimendes"><img style="border-radius: 50%;" src="https://avatars.githubusercontent.com/odavimendes?v=4" width="100px;" alt=""/><br /><sub><b>Davi Silva Mendes</b></sub></a><br /></td>
+    <td align="center"><a href="https://github.com/odavimendes"><img style="border-radius: 50%;filter: blur(5px);" src="https://avatars.githubusercontent.com/odavimendes?v=4" width="100px;" alt=""/><br /><sub><b>Davi Silva Mendes</b></sub></a><br /></td>
   </tr>
 </table>
 </div>
