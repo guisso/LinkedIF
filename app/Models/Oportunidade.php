@@ -72,8 +72,8 @@ class Oportunidade extends Entidade
         'horarioTermino' => 'datetime:H:i',
         'escala' => 'integer',
         'modalidade' => Modalidade::class,
-        'criacao' => 'datetime',
-        'ultimaAtualizacao' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
@@ -132,8 +132,8 @@ class Oportunidade extends Entidade
     public function getEscala(): ?int { return $this->escala; }
     public function getModalidade(): Modalidade { return $this->modalidade; }
     public function getLocalidade(): ?string { return $this->localidade; }
-    public function getCriacao(): \Carbon\Carbon { return $this->criacao; }
-    public function getUltimaAtualizacao(): ?\Carbon\Carbon { return $this->ultimaAtualizacao; }
+    public function getCriacao(): \Carbon\Carbon { return $this->created_at; }
+    public function getUltimaAtualizacao(): ?\Carbon\Carbon { return $this->updated_at; }
 
     // ==================== SETTERS ====================
 

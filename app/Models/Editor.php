@@ -26,6 +26,22 @@ class Editor extends Entidade
     // Opcional: Definir relacionamento inverso para facilitar
     public function usuario()
     {
-        return $this->belongsTo(Usuario::class, 'usuario_id');
+        return $this->belongsTo(Usuario::class, 'usuario_id', 'id');
+    }
+
+    // Getters
+    public function getId(): int
+    {
+        return $this->usuario_id;
+    }
+
+    public function getCnpj(): ?string
+    {
+        return $this->cnpj;
+    }
+
+    public function getDescricao(): ?string
+    {
+        return $this->descricao;
     }
 }
