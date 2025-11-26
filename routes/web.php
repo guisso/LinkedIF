@@ -21,3 +21,8 @@ Route::get('/cadastro', function () {
 Route::get('/home', function () {
     return view('dashboard');
 })->name('home');
+
+// CU04 - Tela de Publicar Oportunidade
+Route::get('/oportunidades/publicar', function () {
+    return view('oportunidades.publicar');
+})->name('oportunidades.publicar');

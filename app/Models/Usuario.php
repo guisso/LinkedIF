@@ -48,8 +48,8 @@ class Usuario extends Entidade
         'whatsApp' => 'boolean',
         'nascimento' => 'date',
         'idade' => 'integer', // 'byte' do UML mapeado para 'integer'
-        'criacao' => 'datetime',
-        'ultimaAtualizacao' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     // ==================== RELAÇÕES ====================
@@ -73,9 +73,9 @@ class Usuario extends Entidade
         // 'seguidor_id' é a chave estrangeira deste modelo
         // 'seguido_id' é a chave estrangeira do modelo relacionado
         return $this->belongsToMany(
-            Usuario::class, 
-            'seguidor_seguido', 
-            'seguidor_id', 
+            Usuario::class,
+            'seguidor_seguido',
+            'seguidor_id',
             'seguido_id'
         );
     }
@@ -87,24 +87,51 @@ class Usuario extends Entidade
     public function seguidoPor(): BelongsToMany
     {
         return $this->belongsToMany(
-            Usuario::class, 
-            'seguidor_seguido', 
-            'seguido_id', 
+            Usuario::class,
+            'seguidor_seguido',
+            'seguido_id',
             'seguidor_id'
         );
     }
 
     // ==================== GETTERS ====================
 
-    public function getId(): int { return $this->id; }
-    public function getNome(): string { return $this->nome; }
-    public function getEmail(): string { return $this->email; }
-    public function getTelefone(): string { return $this->telefone; }
-    public function isWhatsApp(): bool { return $this->whatsApp; }
-    public function getNascimento(): \Carbon\Carbon { return $this->nascimento; }
-    public function getIdade(): int { return $this->idade; }
-    public function getCriacao(): \Carbon\Carbon { return $this->criacao; }
-    public function getUltimaAtualizacao(): ?\Carbon\Carbon { return $this->ultimaAtualizacao; }
+    public function getId(): int
+    {
+        return $this->id;
+    }
+    public function getNome(): string
+    {
+        return $this->nome;
+    }
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+    public function getTelefone(): string
+    {
+        return $this->telefone;
+    }
+    public function isWhatsApp(): bool
+    {
+        return $this->whatsApp;
+    }
+    public function getNascimento(): \Carbon\Carbon
+    {
+        return $this->nascimento;
+    }
+    public function getIdade(): int
+    {
+        return $this->idade;
+    }
+    public function getCriacao(): \Carbon\Carbon
+    {
+        return $this->created_at;
+    }
+    public function getUltimaAtualizacao(): ?\Carbon\Carbon
+    {
+        return $this->updated_at;
+    }
 
     // ==================== SETTERS ====================
 

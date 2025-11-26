@@ -95,8 +95,9 @@
 
                 if (response.ok) {
                     // SUCESSO!
+                    const tokenCompleto = 'Bearer ' + result.data.token;
                     // Salva o token no Local Storage (MUITO IMPORTANTE)
-                    localStorage.setItem('auth_token', result.data.token);
+                    localStorage.setItem('auth_token', tokenCompleto);
 
                     alertArea.innerHTML = `<div class="alert alert-success">Login bem-sucedido! Redirecionando...</div>`;
 
