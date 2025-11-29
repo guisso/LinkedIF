@@ -35,3 +35,9 @@ Route::get('/oportunidades/publicar', function () {
 Route::get('/perfil', function () {
     return view('perfis.perfil');
 })->name('perfil');
+
+// Tela de Sobre
+Route::get('/sobre', function () {
+    return view('_sobre.sobre');
+})->name('_sobre.sobre');
+
