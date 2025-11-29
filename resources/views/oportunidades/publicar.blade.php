@@ -83,6 +83,9 @@
                             <label for="tipo_oportunidade_id" class="form-label required-label">Tipo</label>
                             <select class="form-select" id="tipo_oportunidade_id" name="tipo_oportunidade_id" required>
                                 <option value="">Selecione...</option>
+                                @foreach($tipos as $tipo)
+        <option value="{{ $tipo->id }}">{{ $tipo->nome }}</option>
+    @endforeach
                                 <!-- Será preenchido via JavaScript -->
                             </select>
                         </div>
@@ -192,163 +195,109 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        const formPublicar = document.getElementById('formPublicar');
-        const alertArea = document.getElementById('alert-area');
-        const btnPublicar = document.getElementById('btn-publicar');
-        const selectTipo = document.getElementById('tipo_oportunidade_id');
+    const formPublicar = document.getElementById('formPublicar');
+    const alertArea = document.getElementById('alert-area');
+    const btnPublicar = document.getElementById('btn-publicar');
 
-        // Carrega tipos de oportunidade ao carregar a página
-        document.addEventListener('DOMContentLoaded', async () => {
-            const token = localStorage.getItem('auth_token');
+    // --- SUBMISSÃO DO FORMULÁRIO ---
+    formPublicar.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-            if (!token) {
-                window.location.href = '/login';
-                return;
-            }
+        btnPublicar.disabled = true;
+        btnPublicar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Publicando...';
+        alertArea.innerHTML = '';
 
-            // Carrega tipos de oportunidade da API
-            try {
-                const response = await fetch('/api/v1/tipos-oportunidade', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
+        const token = localStorage.getItem('auth_token');
 
-                if (response.ok) {
-                    const result = await response.json();
-                    const tipos = result.data;
+        if (!token) {
+            window.location.href = '/login';
+            return;
+        }
 
-                    tipos.forEach(tipo => {
-                        const option = document.createElement('option');
-                        option.value = tipo.id;
-                        option.textContent = tipo.nome;
-                        selectTipo.appendChild(option);
-                    });
-                } else {
-                    // Fallback: tipos manuais se a API falhar
-                    const tiposExemplo = [
-                        { id: 1, nome: 'Estágio' },
-                        { id: 2, nome: 'Emprego' },
-                        { id: 3, nome: 'Pesquisa' },
-                        { id: 4, nome: 'Extensão' },
-                        { id: 5, nome: 'Bolsa' },
-                    ];
+        const formData = new FormData(formPublicar);
+        const data = Object.fromEntries(formData.entries());
 
-                    tiposExemplo.forEach(tipo => {
-                        const option = document.createElement('option');
-                        option.value = tipo.id;
-                        option.textContent = tipo.nome;
-                        selectTipo.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Erro ao carregar tipos:', error);
+        // Remove campos vazios
+        Object.keys(data).forEach(key => {
+            if (data[key] === '' || data[key] === null) {
+                delete data[key];
             }
         });
 
-        // Submissão do formulário
-        formPublicar.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            // UI de carregamento
-            btnPublicar.disabled = true;
-            btnPublicar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Publicando...';
-            alertArea.innerHTML = '';
-
-            const token = localStorage.getItem('auth_token');
-
-            if (!token) {
-                window.location.href = '/login';
-                return;
-            }
-
-            const formData = new FormData(formPublicar);
-            const data = Object.fromEntries(formData.entries());
-
-            // Remove campos vazios
-            Object.keys(data).forEach(key => {
-                if (data[key] === '' || data[key] === null) {
-                    delete data[key];
-                }
+        try {
+            const response = await fetch('/api/v1/oportunidades', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    // IMPORTANTE: O backend pode estar esperando no formato "Bearer <token>"
+                    // Se seu backend usa Sanctum ou Passport, troque por:
+                    // 'Authorization': `Bearer ${token}`,
+                    'Authorization': token
+                },
+                body: JSON.stringify(data)
             });
 
-            try {
-                const response = await fetch('/api/v1/oportunidades', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': token
-                    },
-                    body: JSON.stringify(data)
-                });
+            const result = await response.json();
 
-                const result = await response.json();
-
-                if (response.ok) {
-                    // Sucesso!
-                    alertArea.innerHTML = `
-                        <div class="alert alert-success alert-dismissible fade show">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            <strong>Sucesso!</strong> ${result.message}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    `;
-
-                    // Limpa o formulário
-                    formPublicar.reset();
-
-                    // Redireciona após 2 segundos
-                    setTimeout(() => {
-                        window.location.href = '/home';
-                    }, 2000);
-
-                } else {
-                    // Erro
-                    let errorMsg = result.message || 'Erro ao publicar oportunidade.';
-
-                    // Se houver erros de validação, exibe
-                    if (result.errors) {
-                        errorMsg += '<ul class="mb-0 mt-2">';
-                        Object.values(result.errors).forEach(errors => {
-                            errors.forEach(error => {
-                                errorMsg += `<li>${error}</li>`;
-                            });
-                        });
-                        errorMsg += '</ul>';
-                    }
-
-                    alertArea.innerHTML = `
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            ${errorMsg}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    `;
-
-                    // Scroll para o topo
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-
-            } catch (error) {
+            if (response.ok) {
                 alertArea.innerHTML = `
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                        <strong>Erro!</strong> Não foi possível conectar ao servidor.
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Sucesso!</strong> ${result.message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
-            } finally {
-                // Restaura o botão
-                btnPublicar.disabled = false;
-                btnPublicar.innerHTML = '<i class="bi bi-send-fill me-1"></i> Publicar Oportunidade';
-            }
-        });
 
-        // Define data mínima como hoje
-        document.getElementById('inicio').min = new Date().toISOString().split('T')[0];
-        document.getElementById('termino').min = new Date().toISOString().split('T')[0];
-    </script>
+                formPublicar.reset();
+
+                setTimeout(() => {
+                    window.location.href = '/home';
+                }, 2000);
+
+            } else {
+                let errorMsg = result.message || 'Erro ao publicar oportunidade.';
+
+                if (result.errors) {
+                    errorMsg += '<ul class="mb-0 mt-2">';
+                    Object.values(result.errors).forEach(errors => {
+                        errors.forEach(error => {
+                            errorMsg += `<li>${error}</li>`;
+                        });
+                    });
+                    errorMsg += '</ul>';
+                }
+
+                alertArea.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        ${errorMsg}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+        } catch (error) {
+            alertArea.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <strong>Erro!</strong> Não foi possível conectar ao servidor.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        } finally {
+            btnPublicar.disabled = false;
+            btnPublicar.innerHTML = '<i class="bi bi-send-fill me-1"></i> Publicar Oportunidade';
+        }
+    });
+
+    // Define data mínima como hoje
+    document.getElementById('inicio').min = new Date().toISOString().split('T')[0];
+    document.getElementById('termino').min = new Date().toISOString().split('T')[0];
+</script>
+
 
 </body>
 

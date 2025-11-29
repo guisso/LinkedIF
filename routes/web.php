@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\TipoOportunidade;
+
 
 // Rota raiz: Manda diretamente para o login (sem middleware)
 Route::get('/', function () {
@@ -24,5 +26,12 @@ Route::get('/home', function () {
 
 // CU04 - Tela de Publicar Oportunidade
 Route::get('/oportunidades/publicar', function () {
-    return view('oportunidades.publicar');
+    $tipos = TipoOportunidade::orderBy('nome')->get();
+
+    return view('oportunidades.publicar', compact('tipos'));
 })->name('oportunidades.publicar');
+
+// CU05 - Tela de Perfil do Usuário
+Route::get('/perfil', function () {
+    return view('perfis.perfil');
+})->name('perfil');
