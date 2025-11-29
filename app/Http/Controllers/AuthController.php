@@ -451,8 +451,8 @@ class AuthController extends Controller
                     'nome_usuario' => $credencial->getNomeUsuario(),
                     'tipo_perfil' => $credencial->getTipoPerfil()->value,
                     'ativo' => $credencial->isAtivo(),
-                    'criacao' => $credencial->criacao?->toDateTimeString(),
-                    'ultima_atualizacao' => $credencial->ultima_atualizacao?->toDateTimeString(),
+                    'criacao' => $credencial->created_at?->toDateTimeString(),
+                    'ultima_atualizacao' => $credencial->updated_at?->toDateTimeString(),
                 ]
             ], 200);
 

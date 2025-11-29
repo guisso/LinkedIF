@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CandidatoController;
 use App\Http\Controllers\CandidaturaController;
+use App\Http\Controllers\OportunidadeController;
+use App\Http\Controllers\TipoOportunidadeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,12 +34,19 @@ Route::prefix('v1')->group(function () {
      // Listagem Pública (Ex: Candidatos com currículo visível)
      Route::apiResource('candidatos', CandidatoController::class)->only(['index', 'show']);
 
+     // Listagem Pública de Oportunidades (feed)
+     Route::get('/oportunidades', [OportunidadeController::class, 'index'])->name('oportunidades.index');
+     Route::get('/oportunidades/{id}', [OportunidadeController::class, 'show'])->name('oportunidades.show');
+
+     // Tipos de Oportunidade (público)
+     Route::get('/tipos-oportunidade', [TipoOportunidadeController::class, 'index'])->name('tipos-oportunidade.index');
+
 
      // ========================================================================
      // ROTAS PROTEGIDAS (Exigem Token Bearer)
      // ========================================================================
 
-     Route::middleware('auth:sanctum')->group(function () {
+     Route::middleware('auth.token')->group(function () {
 
           // Gestão da Conta
           Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
@@ -55,6 +64,10 @@ Route::prefix('v1')->group(function () {
           // [Editor/Empresa] Ver candidatos de uma vaga específica
           Route::get('/oportunidades/{oportunidadeId}/candidaturas', [CandidaturaController::class, 'porOportunidade'])
                ->name('candidaturas.por-oportunidade');
+
+          // CU04 - Publicar Oportunidade (apenas Editores: Professor/Empresa)
+          Route::post('/oportunidades', [OportunidadeController::class, 'store'])
+               ->name('oportunidades.store');
 
      });
 });
