@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TipoOportunidadeSeeder::class,
             OportunidadeSeeder::class,
+            CandidatoCompletoSeeder::class,
         ]);
     }
 }
