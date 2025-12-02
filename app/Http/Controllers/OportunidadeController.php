@@ -152,26 +152,31 @@ class OportunidadeController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $oportunidades->map(function ($oportunidade) {
-                    return [
-                        'id' => $oportunidade->id,
-                        'codigo' => $oportunidade->codigo,
-                        'titulo' => $oportunidade->titulo,
-                        'descricao' => $oportunidade->descricao,
-                        'requisitos' => $oportunidade->requisitos,
-                        'beneficios' => $oportunidade->beneficios,
-                        'remuneracao' => $oportunidade->remuneracao,
-                        'vagas' => $oportunidade->vagas,
-                        'tipo' => $oportunidade->tipoOportunidade->nome ?? 'N/A',
-                        'modalidade' => $oportunidade->modalidade->label(),
-                        'localidade' => $oportunidade->localidade,
-                        'inicio' => $oportunidade->inicio->format('d/m/Y'),
-                        'termino' => $oportunidade->termino ? $oportunidade->termino->format('d/m/Y') : null,
-                        'editor' => [
-                            'nome' => $oportunidade->editor->usuario->nome ?? 'N/A',
-                        ],
-                        'publicado_em' => $oportunidade->created_at->diffForHumans(),
-                    ];
-                }),
+                    try {
+                        return [
+                            'id' => $oportunidade->id,
+                            'codigo' => $oportunidade->codigo,
+                            'titulo' => $oportunidade->titulo,
+                            'descricao' => $oportunidade->descricao,
+                            'requisitos' => $oportunidade->requisitos,
+                            'beneficios' => $oportunidade->beneficios,
+                            'remuneracao' => $oportunidade->remuneracao,
+                            'vagas' => $oportunidade->vagas,
+                            'tipo' => $oportunidade->tipoOportunidade->nome ?? 'N/A',
+                            'modalidade' => $oportunidade->modalidade->label(),
+                            'localidade' => $oportunidade->localidade,
+                            'inicio' => $oportunidade->inicio->format('d/m/Y'),
+                            'termino' => $oportunidade->termino ? $oportunidade->termino->format('d/m/Y') : null,
+                            'editor' => [
+                                'nome' => $oportunidade->editor->usuario->nome ?? 'N/A',
+                            ],
+                            'publicado_em' => $oportunidade->created_at->diffForHumans(),
+                        ];
+                    } catch (\Exception $e) {
+                        \Log::error('Erro ao mapear oportunidade ID ' . $oportunidade->id . ': ' . $e->getMessage());
+                        return null;
+                    }
+                })->filter(), // Remove valores null
                 'pagination' => [
                     'total' => $oportunidades->total(),
                     'per_page' => $oportunidades->perPage(),
@@ -181,6 +186,7 @@ class OportunidadeController extends Controller
             ], 200);
 
         } catch (\Exception $e) {
+            \Log::error('Erro ao listar oportunidades: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao listar oportunidades.',
@@ -202,9 +208,23 @@ class OportunidadeController extends Controller
                 'tipoOportunidade',
                 'editor' => function ($query) {
                     $query->with('usuario');
-                },
-                'habilidades'
+                }
             ])->findOrFail($id);
+
+            // Tenta carregar habilidades se a tabela existir
+            $habilidades = [];
+            try {
+                $oportunidade->load('habilidades');
+                $habilidades = $oportunidade->habilidades->map(function ($hab) {
+                    return [
+                        'id' => $hab->id,
+                        'nome' => $hab->nome,
+                    ];
+                });
+            } catch (\Exception $e) {
+                // Tabela de relacionamento não existe ainda
+                \Log::warning('Não foi possível carregar habilidades: ' . $e->getMessage());
+            }
 
             return response()->json([
                 'success' => true,
@@ -225,12 +245,7 @@ class OportunidadeController extends Controller
                     'horario_inicio' => $oportunidade->horarioInicio ? $oportunidade->horarioInicio->format('H:i') : null,
                     'horario_termino' => $oportunidade->horarioTermino ? $oportunidade->horarioTermino->format('H:i') : null,
                     'escala' => $oportunidade->escala,
-                    'habilidades' => $oportunidade->habilidades->map(function ($hab) {
-                        return [
-                            'id' => $hab->id,
-                            'nome' => $hab->nome,
-                        ];
-                    }),
+                    'habilidades' => $habilidades,
                     'editor' => [
                         'nome' => $oportunidade->editor->usuario->nome ?? 'N/A',
                         'descricao' => $oportunidade->editor->descricao ?? '',
@@ -239,11 +254,55 @@ class OportunidadeController extends Controller
                 ]
             ], 200);
 
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            \Log::error('Oportunidade não encontrada. ID: ' . $id);
             return response()->json([
                 'success' => false,
                 'message' => 'Oportunidade não encontrada.',
             ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Erro ao buscar oportunidade: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao carregar oportunidade: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Exibe os detalhes de uma oportunidade específica para candidatura na interface web
+     * 
+     * @param int $id
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function showWeb($id)
+    {
+        try {
+            $oportunidade = Oportunidade::with([
+                'tipoOportunidade',
+                'editor' => function ($query) {
+                    $query->with('usuario');
+                },
+                'habilidades'
+            ])->findOrFail($id);
+
+            // Verifica se o usuário já se candidatou
+            $jaCandidatado = false;
+            if (auth()->check()) {
+                $credencial = auth()->user();
+                $usuarioId = $credencial->getId();
+                
+                $jaCandidatado = \App\Models\Candidatura::whereHas('candidato', function($query) use ($usuarioId) {
+                    $query->where('usuario_id', $usuarioId);
+                })
+                ->where('oportunidade_id', $id)
+                ->exists();
+            }
+
+            return view('oportunidades.show', compact('oportunidade', 'jaCandidatado'));
+
+        } catch (\Exception $e) {
+            return redirect()->route('home')->with('error', 'Oportunidade não encontrada.');
         }
     }
 
